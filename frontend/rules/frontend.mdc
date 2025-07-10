@@ -1,0 +1,18 @@
+---
+description: "Frontend Project Rules"
+globs: "**/*.tsx"
+alwaysApply: true
+---
+
+# Frontend Project Rules
+
+This project contains **ONLY frontend code**. Do not attempt to add any API routes or backend functionality.
+
+## Important Guidelines:
+
+- This is a frontend-only project
+- Do not create or suggest API routes in `/api` folders
+- Do not add server-side functionality
+- Focus only on client-side components, pages, and styling
+- Use external APIs or mock data for any data requirements
+- All functionality should be handled on the client side

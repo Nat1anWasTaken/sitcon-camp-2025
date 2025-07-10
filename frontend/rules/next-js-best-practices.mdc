@@ -1,0 +1,134 @@
+---
+description: "Next.js Frontend Development Best Practices"
+globs: "**/*.tsx"
+alwaysApply: true
+---
+
+# Next.js Frontend Development Best Practices
+
+## 🏗️ Architecture Concepts
+
+### 1. **Rendering Strategy Understanding**
+
+- **SSR (Server-Side Rendering)**: Renders on server for each request
+- **SSG (Static Site Generation)**: Pre-renders at build time
+- **ISR (Incremental Static Regeneration)**: Incremental updates to static pages
+- **CSR (Client-Side Rendering)**: Browser-side rendering
+- **Hybrid Rendering**: Choose the most appropriate rendering method per page
+
+### 2. **App Router vs Pages Router**
+
+- **App Router**: New file-system routing with React Server Components support
+- **Server Components vs Client Components**: Understand when to use `'use client'`
+- **Nested Layouts**: Share UI state and avoid re-renders
+
+## 🎯 Design Principles
+
+### 3. **Component Design Philosophy**
+
+- **Single Responsibility**: Each component should do one thing well
+- **Composition over Inheritance**: Compose functionality through props and children
+- **Stateless First**: Prefer stateless components when possible
+- **Predictability**: Same props should produce same output
+
+### 4. **State Management Strategy**
+
+- **Proximity Principle**: Place state closest to where it's used
+- **Lifting Principle**: Only lift state when multiple components need to share it
+- **Server State vs Client State**: Distinguish and choose appropriate management
+- **Avoid Over-Statification**: Don't store what can be computed
+
+## 📊 Data Flow Concepts
+
+### 5. **Data Fetching Patterns**
+
+- **Waterfall vs Parallel**: Understand data dependency relationships
+- **Caching Strategy**: When to use cache, revalidate, no-store
+- **Boundary Handling**: Unified handling of Loading, Error, Empty states
+- **Optimistic Updates**: Interaction patterns that improve UX
+
+### 6. **Performance Mindset**
+
+- **Critical Rendering Path**: Prioritize above-the-fold content loading
+- **Code Splitting**: Load on demand, reduce initial bundle size
+- **Preloading Strategy**: Predict user behavior, preload resources
+- **Memoization**: Avoid unnecessary re-computation and re-renders
+
+## 🔄 Development Flow Concepts
+
+### 7. **Type Safety Culture**
+
+- **Types First**: Define interfaces before implementation
+- **Progressive Typing**: Evolution from any to specific types
+- **Types as Documentation**: Let type system carry documentation responsibility
+
+### 8. **Testing Pyramid**
+
+- **Unit Tests**: Test pure functions and logic
+- **Integration Tests**: Test component interactions
+- **End-to-End Tests**: Test complete user flows
+- **Visual Regression Tests**: Ensure UI consistency
+
+## 🎨 User Experience Principles
+
+### 9. **Feedback Mechanisms**
+
+- **Immediate Feedback**: Instant response to user actions
+- **Progress Indication**: Show progress for long-running operations
+- **Error Recovery**: Graceful error handling and recovery mechanisms
+- **Accessibility Design**: Consider all users' experience
+
+### 10. **Responsive Design Thinking**
+
+- **Mobile First**: Start designing from small screens
+- **Progressive Enhancement**: From basic to enhanced functionality
+- **Content First**: Content-driven design decisions
+- **Performance Budget**: Set performance targets for different devices
+
+## 🔧 Maintainability Concepts
+
+### 11. **Code Organization Philosophy**
+
+- **Separation of Concerns**: Clear boundaries between UI, logic, and data
+- **Dependency Direction**: High-level modules shouldn't depend on low-level ones
+- **Open-Closed Principle**: Open for extension, closed for modification
+- **Consistency**: Unified code style and patterns within team
+
+### 12. **Scalability Thinking**
+
+- **Configuration vs Code**: What should be configurable
+- **Internationalization Readiness**: Consider even if not needed now
+- **Performance Monitoring**: Establish performance baselines and monitoring
+- **Version Evolution**: Smooth upgrade and migration strategies
+
+## 📋 Implementation Guidelines
+
+### 13. **File Structure Best Practices**
+
+- Use feature-based folder organization
+- Keep related files close together
+- Separate concerns: components, hooks, utils, types
+- Use consistent naming conventions
+
+### 14. **Component Patterns**
+
+- Prefer composition patterns over complex prop drilling
+- Use render props and compound components for flexibility
+- Implement proper error boundaries
+- Design for reusability without over-engineering
+
+### 15. **Performance Optimization**
+
+- Use React.memo() judiciously, not everywhere
+- Implement proper loading and error states
+- Optimize images with Next.js Image component
+- Minimize client-side JavaScript bundle
+
+### 16. **Developer Experience**
+
+- Set up proper linting and formatting rules
+- Use TypeScript strictly with proper configurations
+- Implement proper Git hooks and CI/CD pipelines
+- Document complex business logic and architectural decisions
+
+These concepts form the mental framework for Next.js development, helping make better architectural decisions.
