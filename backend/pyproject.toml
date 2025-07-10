@@ -1,0 +1,10 @@
+[project]
+dependencies = [
+  "fastapi>=0.116.0",
+  "uvicorn>=0.35.0",
+]
+description = "Add your description here"
+name = "backend"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.0"
