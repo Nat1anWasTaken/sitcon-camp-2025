@@ -21,7 +21,7 @@ export class ChatApi {
         : null;
 
     try {
-      const response = await fetch(`${baseURL}/chat/`, {
+      const response = await fetch(`${baseURL}/chat/siri`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

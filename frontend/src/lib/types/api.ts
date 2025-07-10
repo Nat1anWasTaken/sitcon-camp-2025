@@ -67,7 +67,7 @@ export interface ApiEndpoints {
   me: "/auth/@me";
 
   // 聊天端點
-  chat: "/chat/";
+  chat: "/chat/siri";
 
   // 基本端點
   root: "/";
