@@ -9,8 +9,7 @@ from src.schemas import ChatMessage
 # 初始化 Gemini client
 client = genai.Client(
     vertexai=True,
-    project=os.getenv("GOOGLE_CLOUD_PROJECT"),
-    location=os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1"),
+    api_key=os.getenv("GEMINI_API_KEY"),
 )
 
 MODEL_ID = "gemini-2.0-flash"
