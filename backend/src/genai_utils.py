@@ -1,10 +1,11 @@
+import base64
 import os
 from typing import AsyncGenerator, List, Optional
 
 from google import genai
 from google.genai import types
 
-from src.schemas import ChatMessage
+from src.schemas import ChatMessage, ImageContent, TextContent
 
 # 檢查 API 金鑰是否存在
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -27,12 +28,38 @@ MODEL_ID = "gemini-2.0-flash"
 def build_contents(history: List[ChatMessage], messages: List[ChatMessage]):
     """
     將歷史訊息與當前訊息轉換為 Gemini API 所需格式
+    支援文字和圖片內容
     """
     contents = []
     for msg in history + messages:
-        contents.append(
-            types.Content(role=msg.role, parts=[types.Part.from_text(text=msg.content)])
-        )
+        parts = []
+
+        # 處理 content，可能是字串或複雜內容列表
+        if isinstance(msg.content, str):
+            # 純文字訊息
+            parts.append(types.Part.from_text(text=msg.content))
+        elif isinstance(msg.content, list):
+            # 複雜內容（文字 + 圖片）
+            for content_item in msg.content:
+                if isinstance(content_item, TextContent):
+                    parts.append(types.Part.from_text(text=content_item.text))
+                elif isinstance(content_item, ImageContent):
+                    # 處理 base64 編碼的圖片
+                    if content_item.data.startswith("data:"):
+                        # 移除 data URL 前綴
+                        base64_data = content_item.data.split(",")[1]
+                    else:
+                        base64_data = content_item.data
+
+                    # 解碼 base64 圖片
+                    image_bytes = base64.b64decode(base64_data)
+                    parts.append(
+                        types.Part.from_bytes(
+                            data=image_bytes, mime_type=content_item.mime_type
+                        )
+                    )
+
+        contents.append(types.Content(role=msg.role, parts=parts))
     return contents
 
 
