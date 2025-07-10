@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -70,3 +70,29 @@ class UserInDB(UserBase):
     id: int
     hashed_password: str
     is_active: bool
+
+
+class ChatMessage(BaseModel):
+    """
+    聊天訊息模型
+    """
+    role: str = Field(..., description="訊息角色 (user, assistant, system)")
+    content: str = Field(..., description="訊息內容")
+    timestamp: Optional[datetime] = Field(None, description="訊息時間戳")
+
+
+class ChatRequest(BaseModel):
+    """
+    聊天請求模型
+    """
+    history_messages: List[ChatMessage] = Field(default=[], description="歷史訊息")
+    messages: List[ChatMessage] = Field(..., description="當前訊息")
+
+
+class ChatResponse(BaseModel):
+    """
+    聊天響應模型
+    """
+    message: str = Field(..., description="回應訊息")
+    timestamp: datetime = Field(..., description="響應時間戳")
+    status: str = Field(default="success", description="響應狀態")

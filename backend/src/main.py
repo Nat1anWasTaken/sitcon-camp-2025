@@ -5,8 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import auth
+from .routers import auth, chat
 
+# 建立資料庫表
 Base.metadata.create_all(bind=engine)
 
 load_dotenv()
@@ -30,6 +31,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(chat.router)
 
 
 @app.get("/")
