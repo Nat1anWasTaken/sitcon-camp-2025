@@ -3,13 +3,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-interface GenieProps {
+interface SiriProps {
   isActive?: boolean;
   onClick?: () => void;
   className?: string;
 }
 
-export function Genie({ isActive = false, onClick, className }: GenieProps) {
+export function Siri({ isActive = false, onClick, className }: SiriProps) {
   return (
     <div
       className={cn(
@@ -39,7 +39,7 @@ export function Genie({ isActive = false, onClick, className }: GenieProps) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium text-sm">Genie</h3>
+          <h3 className="font-medium text-sm">Siri</h3>
           <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full">
             AI
           </span>

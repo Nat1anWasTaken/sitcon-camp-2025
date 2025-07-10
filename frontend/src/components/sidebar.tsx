@@ -4,23 +4,23 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Contact, ContactData } from "./contact";
-import { Genie } from "./genie";
+import { Siri } from "./siri";
 
 interface SidebarProps {
   contacts: ContactData[];
   activeContactId?: string;
-  isGenieActive?: boolean;
+  isSiriActive?: boolean;
   onContactClick?: (contact: ContactData) => void;
-  onGenieClick?: () => void;
+  onSiriClick?: () => void;
   className?: string;
 }
 
 export function Sidebar({
   contacts,
   activeContactId,
-  isGenieActive,
+  isSiriActive,
   onContactClick,
-  onGenieClick,
+  onSiriClick,
   className,
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,9 +80,9 @@ export function Sidebar({
       {/* Contacts List */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
-          {/* Genie AI Bot */}
+          {/* Siri AI Bot */}
           <div className="mb-3">
-            <Genie isActive={isGenieActive} onClick={onGenieClick} />
+            <Siri isActive={isSiriActive} onClick={onSiriClick} />
           </div>
 
           {/* Divider */}
