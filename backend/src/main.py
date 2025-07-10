@@ -1,11 +1,15 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
 from .routers import auth
 
-# 創建資料庫表
 Base.metadata.create_all(bind=engine)
+
+load_dotenv()
 
 app = FastAPI(
     title="SITCON Camp 2025 Backend",
@@ -13,16 +17,18 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# 配置 CORS
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split()
+if not allowed_origins or allowed_origins == [""]:
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 在生產環境中應該限制為特定的域名
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 包含路由
 app.include_router(auth.router)
 
 
