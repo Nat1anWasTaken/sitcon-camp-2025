@@ -8,7 +8,6 @@ from src.schemas import ChatMessage
 
 # 初始化 Gemini client
 client = genai.Client(
-    vertexai=True,
     api_key=os.getenv("GEMINI_API_KEY"),
 )
 
