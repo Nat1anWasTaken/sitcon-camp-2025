@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 # JWT 配置
 SECRET_KEY = "your-secret-key-here-change-in-production"  # 在生產環境中應該使用環境變數
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 7 * 24 * 60  # 7 天
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
