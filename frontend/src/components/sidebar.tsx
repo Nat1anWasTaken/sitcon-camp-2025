@@ -1,5 +1,6 @@
 "use client";
 
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Contact, ContactData } from "./contact";
@@ -86,7 +87,9 @@ export function Sidebar({
 
           {/* Divider */}
           {(filteredContacts.length > 0 || searchQuery) && (
-            <div className="mb-3 border-t border-sidebar-border pt-3"></div>
+            <div className="mb-3">
+              <Separator className="mb-3" />
+            </div>
           )}
 
           {/* Regular Contacts */}

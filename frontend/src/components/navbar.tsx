@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +12,22 @@ import {
 import { cn } from "@/lib/utils";
 import { LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface NavbarProps {
   className?: string;
 }
 
 export function Navbar({ className }: NavbarProps) {
+  const pathname = usePathname();
+
+  // 假設用戶尚未登入（之後可以根據實際的認證狀態來判斷）
+  const isAuthenticated = false;
+
+  // 判斷是否在認證相關頁面（登入、註冊等）
+  const isAuthPage =
+    pathname?.startsWith("/login") || pathname?.startsWith("/register");
+
   return (
     <nav
       className={cn(
@@ -39,35 +50,51 @@ export function Navbar({ className }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Right side - User avatar with dropdown */}
+          {/* Right side - Authentication buttons or User avatar */}
           <div className="flex items-center space-x-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="relative h-8 w-8 rounded-full ring-2 ring-transparent transition-all hover:ring-2 hover:ring-primary/20">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder-avatar.jpg" alt="用戶頭像" />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>個人資料</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>設定</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>登出</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isAuthenticated ? (
+              // 已登入用戶的頭像下拉選單
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="relative h-8 w-8 rounded-full ring-2 ring-transparent transition-all hover:ring-2 hover:ring-primary/20">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src="/placeholder-avatar.jpg"
+                        alt="用戶頭像"
+                      />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>個人資料</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>設定</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>登出</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : !isAuthPage ? (
+              // 未登入用戶的登入/註冊按鈕（不在認證頁面時顯示）
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" asChild>
+                  <Link href="/login">登入</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register">註冊</Link>
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
