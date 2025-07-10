@@ -19,7 +19,7 @@ def stream_response(history, messages):
     return generator
 
 
-@router.post("/")
+@router.post("/siri")
 async def chat_endpoint(
     chat_request: ChatRequest,
     current_user: User = Depends(get_current_active_user),
