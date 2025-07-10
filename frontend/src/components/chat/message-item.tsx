@@ -2,11 +2,46 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { ChatMessage } from "@/lib/types/api";
+import { ChatMessage, MessageContent } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 
 interface MessageItemProps {
   message: ChatMessage;
+}
+
+// 渲染複合內容
+function renderContent(content: string | MessageContent[]) {
+  // 向後兼容：處理純文字內容
+  if (typeof content === "string") {
+    return <p className="text-sm whitespace-pre-wrap">{content}</p>;
+  }
+
+  // 處理複合內容
+  return (
+    <div className="space-y-3">
+      {content.map((item, index) => {
+        if (item.type === "text") {
+          return (
+            <p key={index} className="text-sm whitespace-pre-wrap">
+              {item.text}
+            </p>
+          );
+        } else if (item.type === "image") {
+          return (
+            <div key={index} className="max-w-sm">
+              <img
+                src={`data:${item.mime_type};base64,${item.data}`}
+                alt="附件圖片"
+                className="rounded-lg max-w-full h-auto border border-border"
+                loading="lazy"
+              />
+            </div>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
 }
 
 export function MessageItem({ message }: MessageItemProps) {
@@ -40,7 +75,7 @@ export function MessageItem({ message }: MessageItemProps) {
             isUser ? "bg-primary text-primary-foreground" : "bg-muted"
           )}
         >
-          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+          {renderContent(message.content)}
         </Card>
         {message.timestamp && (
           <p

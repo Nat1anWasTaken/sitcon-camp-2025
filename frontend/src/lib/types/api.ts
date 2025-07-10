@@ -89,9 +89,37 @@ export class ApiError extends Error {
 }
 
 // Chat 相關型別
+
+// 文字內容類型
+export interface TextContent {
+  type: "text";
+  text: string;
+}
+
+// 圖片內容類型
+export interface ImageContent {
+  type: "image";
+  data: string; // Base64 編碼的圖片資料或 data URL
+  mime_type: string; // 圖片 MIME 類型
+}
+
+// 複合內容類型
+export type MessageContent = TextContent | ImageContent;
+
+// 支援的圖片 MIME 類型
+export const SUPPORTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+] as const;
+
+export type SupportedImageType = (typeof SUPPORTED_IMAGE_TYPES)[number];
+
 export interface ChatMessage {
   role: string; // user, assistant, system
-  content: string;
+  content: string | MessageContent[]; // 支援純文字或複合內容
   timestamp?: string | null;
 }
 
@@ -103,4 +131,14 @@ export interface ChatRequest {
 export interface ChatResponse {
   // 根據實際 API 回應調整
   [key: string]: unknown;
+}
+
+// 圖片處理相關類型
+export interface ImageFile {
+  id: string;
+  file: File;
+  url: string; // 用於預覽的 URL
+  base64: string; // Base64 編碼
+  mimeType: SupportedImageType;
+  size: number;
 }
