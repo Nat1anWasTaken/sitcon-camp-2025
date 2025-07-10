@@ -31,17 +31,11 @@ uv sync
 
 ## 初始化資料庫
 
-首次執行前需要初始化資料庫：
+資料庫會在首次啟動應用程式時自動初始化。
 
-```bash
-# 執行資料庫初始化腳本
-uv run python init_db.py
-```
+主要資料表：
 
-這會建立以下資料表：
-
-- `users` (使用者)
-- `posts` (文章)
+- `users` (使用者) - 包含身份驗證功能
 
 ## 啟動應用程式
 
@@ -56,13 +50,13 @@ uv run python start_dev.py
 ### 一般啟動方式
 
 ```bash
-uv run uvicorn main:app --reload
+uv run uvicorn src.main:app --reload
 ```
 
 ### 生產模式
 
 ```bash
-uv run uvicorn main:app --host 0.0.0.0 --port 8000
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
 
 ## API 端點
@@ -76,29 +70,39 @@ uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 ### 主要 API 端點
 
-#### 使用者相關
+#### 身份驗證相關
 
-- `POST /api/v1/users/` - 建立新使用者
-- `GET /api/v1/users/` - 取得使用者列表
-- `GET /api/v1/users/{user_id}` - 取得特定使用者
+- `POST /auth/register` - 用戶註冊
+- `POST /auth/login` - 用戶登入
+- `GET /auth/@me` - 獲取當前用戶資訊
 
-#### 文章相關
+#### 其他端點
 
-- `POST /api/v1/posts/` - 建立新文章
-- `GET /api/v1/posts/` - 取得文章列表
+- `GET /` - API 根目錄
+- `GET /health` - 健康檢查
+- `GET /api/v1/hello` - 測試端點
+
+詳細的身份驗證 API 文檔請參考 `AUTH_API.md` 文件。
 
 ## 專案結構
 
 ```
 backend/
-├── main.py          # 主應用程式
-├── models.py        # 資料庫模型
-├── schemas.py       # Pydantic 結構
-├── database.py      # 資料庫連接
-├── init_db.py       # 資料庫初始化腳本
-├── start_dev.py     # 開發啟動腳本
-├── pyproject.toml   # 專案配置
-└── README.md        # 此檔案
+├── src/                 # 源代碼目錄
+│   ├── __init__.py      # Python 包初始化
+│   ├── main.py          # 主應用程式
+│   ├── models.py        # 資料庫模型
+│   ├── schemas.py       # Pydantic 結構
+│   ├── database.py      # 資料庫連接
+│   ├── auth.py          # 身份驗證相關
+│   └── routers/         # API 路由
+│       ├── __init__.py
+│       └── auth.py      # 身份驗證路由
+├── main.py              # 應用程式入口點
+├── start_dev.py         # 開發啟動腳本
+├── pyproject.toml       # 專案配置
+├── AUTH_API.md          # 身份驗證 API 文檔
+└── README.md            # 此檔案
 ```
 
 ## 故障排除
@@ -132,6 +136,8 @@ backend/
 ## 開發指南
 
 - 修改程式碼後，開發模式會自動重載
-- 新增 API 端點請在 `main.py` 中定義
-- 新增資料模型請在 `models.py` 中定義
-- 新增 Pydantic 結構請在 `schemas.py` 中定義
+- 新增 API 端點請在 `src/routers/` 目錄中定義對應的路由文件
+- 新增資料模型請在 `src/models.py` 中定義
+- 新增 Pydantic 結構請在 `src/schemas.py` 中定義
+- 身份驗證相關功能請在 `src/auth.py` 中實現
+- 資料庫相關配置請在 `src/database.py` 中修改
