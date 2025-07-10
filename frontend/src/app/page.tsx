@@ -45,7 +45,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[calc(100vh-4rem)]">
       {/* 側邊欄 */}
       <div className="w-80">
         <Sidebar

@@ -1,8 +1,44 @@
+"use client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { LoginCredentials, UserCreate } from "../../types/api";
 import { AuthApi } from "../auth";
+
+/**
+ * 檢查認證狀態的 hook
+ */
+export const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 檢查是否有儲存的 token
+    const checkAuth = () => {
+      setIsAuthenticated(AuthApi.isAuthenticated());
+      setIsLoading(false);
+    };
+
+    checkAuth();
+
+    // 監聽 storage 變化（當在其他標籤頁登入/登出時）
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "access_token") {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  return { isAuthenticated, isLoading };
+};
 
 /**
  * 登入 mutation hook

@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth, useLogout } from "@/lib/api/hooks";
 import { cn } from "@/lib/utils";
 import { LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
@@ -20,13 +21,16 @@ interface NavbarProps {
 
 export function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
-
-  // 假設用戶尚未登入（之後可以根據實際的認證狀態來判斷）
-  const isAuthenticated = false;
+  const { isAuthenticated, isLoading } = useAuth();
+  const logout = useLogout();
 
   // 判斷是否在認證相關頁面（登入、註冊等）
   const isAuthPage =
     pathname?.startsWith("/login") || pathname?.startsWith("/register");
+
+  const handleLogout = () => {
+    logout.mutate();
+  };
 
   return (
     <nav
@@ -52,7 +56,10 @@ export function Navbar({ className }: NavbarProps) {
 
           {/* Right side - Authentication buttons or User avatar */}
           <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
+            {isLoading ? (
+              // 載入中狀態
+              <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+            ) : isAuthenticated ? (
               // 已登入用戶的頭像下拉選單
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -78,9 +85,13 @@ export function Navbar({ className }: NavbarProps) {
                     <span>設定</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                  <DropdownMenuItem
+                    className="text-red-600 focus:text-red-600"
+                    onClick={handleLogout}
+                    disabled={logout.isPending}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>登出</span>
+                    <span>{logout.isPending ? "登出中..." : "登出"}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
