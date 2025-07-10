@@ -78,9 +78,29 @@ export class AuthApi {
   }
 
   /**
-   * 檢查是否已認證
+   * 檢查是否已認證（向服務器驗證）
    */
-  static isAuthenticated(): boolean {
+  static async isAuthenticated(): Promise<boolean> {
+    const token = this.getStoredToken();
+    if (!token) {
+      return false;
+    }
+
+    try {
+      // 嘗試獲取當前用戶資訊來驗證 token 是否有效
+      const response = await this.getCurrentUser();
+      return !response.error;
+    } catch (error) {
+      // 如果請求失敗，清除無效的 token
+      this.logout();
+      return false;
+    }
+  }
+
+  /**
+   * 檢查本地是否有 token（不向服務器驗證）
+   */
+  static hasToken(): boolean {
     return !!this.getStoredToken();
   }
 }

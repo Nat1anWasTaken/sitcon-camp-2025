@@ -13,9 +13,12 @@ export const useAuth = () => {
   const { data: isAuthenticated = false, isLoading } = useQuery({
     queryKey: ["auth", "status"],
     queryFn: () => AuthApi.isAuthenticated(),
-    staleTime: 0, // 始終重新檢查
+    staleTime: 0,
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     refetchInterval: false,
+    retry: 1,
+    retryDelay: 1000,
   });
 
   return { isAuthenticated, isLoading };
