@@ -11,6 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLogin } from "@/lib/api/hooks/use-auth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -20,19 +21,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const loginMutation = useLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    // TODO: 實作登入邏輯
-    console.log("登入資料:", { email, password, rememberMe });
-
-    // 模擬 API 請求
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    // 使用 React Query mutation 執行登入
+    loginMutation.mutate({
+      username: email, // API 使用 username 欄位
+      password: password,
+      grant_type: "password",
+    });
   };
 
   return (
@@ -109,8 +109,12 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "登入中..." : "登入"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? "登入中..." : "登入"}
             </Button>
           </form>
 

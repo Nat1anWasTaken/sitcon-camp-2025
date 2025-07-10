@@ -8,9 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRegister } from "@/lib/api/hooks/use-auth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -24,9 +24,9 @@ export default function RegisterPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  const registerMutation = useRegister();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -53,15 +53,13 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    // TODO: 實作註冊邏輯
-    console.log("註冊資料:", formData);
-
-    // 模擬 API 請求
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    // 使用 React Query mutation 執行註冊
+    registerMutation.mutate({
+      email: formData.email,
+      username: formData.email, // 使用 email 作為 username
+      full_name: formData.name || null,
+      password: formData.password,
+    });
   };
 
   return (
@@ -174,9 +172,9 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading || !passwordsMatch}
+              disabled={registerMutation.isPending || !passwordsMatch}
             >
-              {isLoading ? "註冊中..." : "註冊"}
+              {registerMutation.isPending ? "註冊中..." : "註冊"}
             </Button>
           </form>
 
