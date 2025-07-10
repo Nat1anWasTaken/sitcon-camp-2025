@@ -1,7 +1,8 @@
+import os
 from datetime import datetime
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, computed_field
 
 
 class UserBase(BaseModel):
@@ -122,3 +123,83 @@ class ChatResponse(BaseModel):
     message: str = Field(..., description="回應訊息")
     timestamp: datetime = Field(..., description="響應時間戳")
     status: str = Field(default="success", description="響應狀態")
+
+
+# Contact 相關模型
+class ContactBase(BaseModel):
+    """
+    聯絡人基礎模型
+    """
+
+    name: str = Field(..., min_length=1, max_length=100, description="聯絡人姓名")
+    description: Optional[str] = Field(None, description="聯絡人描述")
+
+
+class ContactCreate(ContactBase):
+    """
+    聯絡人創建模型
+    """
+
+    pass
+
+
+class ContactUpdate(BaseModel):
+    """
+    聯絡人更新模型
+    """
+
+    name: Optional[str] = Field(
+        None, min_length=1, max_length=100, description="聯絡人姓名"
+    )
+    description: Optional[str] = Field(None, description="聯絡人描述")
+
+
+class ContactResponse(ContactBase):
+    """
+    聯絡人響應模型
+    """
+
+    id: int
+    avatar_key: Optional[str] = Field(None, description="頭像在 MinIO 中的對象鍵")
+    user_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    @computed_field
+    @property
+    def avatar_url(self) -> Optional[str]:
+        """
+        動態生成頭像 URL
+        """
+        if not self.avatar_key:
+            return None
+
+        bucket_name = os.getenv("S3_BUCKET", "my-bucket")
+        public_url = os.getenv("S3_ENDPOINT", "http://localhost:9000")
+
+        return f"{public_url}/{bucket_name}/{self.avatar_key}"
+
+    class Config:
+        from_attributes = True
+
+
+class ContactListResponse(BaseModel):
+    """
+    聯絡人列表響應模型
+    """
+
+    contacts: List[ContactResponse]
+    total: int
+    page: int
+    size: int
+
+
+class FileUploadResponse(BaseModel):
+    """
+    文件上傳響應模型
+    """
+
+    filename: str
+    url: str
+    size: int
+    content_type: str
