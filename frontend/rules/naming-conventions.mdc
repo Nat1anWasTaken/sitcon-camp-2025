@@ -1,0 +1,12 @@
+---
+description: "Naming Conventions"
+globs: "**/*.tsx"
+alwaysApply: true
+---
+
+- Use PascalCase for component names
+- Use camelCase for function names
+- Use kebab-case for file names, even if it's a component
+- Use snake_case for variable names
+- Use CONSTANT_CASE for constant names
+- Use camelCase for class names
