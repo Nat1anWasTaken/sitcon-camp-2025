@@ -1,8 +1,7 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { LoginCredentials, UserCreate } from "../../types/api";
 import { AuthApi } from "../auth";
@@ -11,31 +10,13 @@ import { AuthApi } from "../auth";
  * 檢查認證狀態的 hook
  */
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // 檢查是否有儲存的 token
-    const checkAuth = () => {
-      setIsAuthenticated(AuthApi.isAuthenticated());
-      setIsLoading(false);
-    };
-
-    checkAuth();
-
-    // 監聽 storage 變化（當在其他標籤頁登入/登出時）
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "access_token") {
-        checkAuth();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  const { data: isAuthenticated = false, isLoading } = useQuery({
+    queryKey: ["auth", "status"],
+    queryFn: () => AuthApi.isAuthenticated(),
+    staleTime: 0, // 始終重新檢查
+    refetchOnWindowFocus: true,
+    refetchInterval: false,
+  });
 
   return { isAuthenticated, isLoading };
 };
@@ -59,7 +40,10 @@ export const useLogin = () => {
       // 設定 token
       AuthApi.setToken(data.access_token);
 
-      // 清除查詢緩存
+      // 更新認證狀態查詢
+      queryClient.setQueryData(["auth", "status"], true);
+
+      // 清除用戶相關查詢緩存
       queryClient.invalidateQueries({ queryKey: ["user"] });
 
       // 顯示成功訊息
@@ -117,7 +101,10 @@ export const useLogout = () => {
       AuthApi.logout();
     },
     onSuccess: () => {
-      // 清除查詢緩存
+      // 更新認證狀態查詢
+      queryClient.setQueryData(["auth", "status"], false);
+
+      // 清除所有查詢緩存
       queryClient.clear();
 
       // 顯示成功訊息
