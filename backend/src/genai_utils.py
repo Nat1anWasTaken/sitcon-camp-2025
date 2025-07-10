@@ -6,9 +6,19 @@ from google.genai import types
 
 from src.schemas import ChatMessage
 
+# 檢查 API 金鑰是否存在
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    raise ValueError(
+        "GEMINI_API_KEY 環境變數未設定！"
+        "\n請在 .env 檔案中設定 GEMINI_API_KEY=your-api-key"
+        "\n或者從 https://aistudio.google.com/app/apikey 取得 API 金鑰"
+    )
+
 # 初始化 Gemini client
 client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY"),
+    api_key=GEMINI_API_KEY,
 )
 
 MODEL_ID = "gemini-2.0-flash"

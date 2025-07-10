@@ -66,6 +66,9 @@ export interface ApiEndpoints {
   login: "/auth/login";
   me: "/auth/@me";
 
+  // 聊天端點
+  chat: "/chat/";
+
   // 基本端點
   root: "/";
   health: "/health";
@@ -83,4 +86,21 @@ export class ApiError extends Error {
     this.status = status;
     this.response = response;
   }
+}
+
+// Chat 相關型別
+export interface ChatMessage {
+  role: string; // user, assistant, system
+  content: string;
+  timestamp?: string | null;
+}
+
+export interface ChatRequest {
+  history_messages?: ChatMessage[];
+  messages: ChatMessage[];
+}
+
+export interface ChatResponse {
+  // 根據實際 API 回應調整
+  [key: string]: unknown;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatInterface } from "@/components/chat";
 import { ContactData } from "@/components/contact";
 import { Sidebar } from "@/components/sidebar";
 import { useState } from "react";
@@ -38,10 +39,18 @@ const mockContacts: ContactData[] = [
 
 export default function Home() {
   const [activeContactId, setActiveContactId] = useState<string>();
+  const [isSiriActive, setIsSiriActive] = useState<boolean>(false);
 
   const handleContactClick = (contact: ContactData) => {
     setActiveContactId(contact.id);
+    setIsSiriActive(false); // 取消Siri選擇
     console.log("選擇的聯絡人:", contact.name);
+  };
+
+  const handleSiriClick = () => {
+    setIsSiriActive(true);
+    setActiveContactId(undefined); // 取消聯絡人選擇
+    console.log("選擇了 Siri AI 助手");
   };
 
   return (
@@ -51,35 +60,45 @@ export default function Home() {
         <Sidebar
           contacts={mockContacts}
           activeContactId={activeContactId}
+          isSiriActive={isSiriActive}
           onContactClick={handleContactClick}
+          onSiriClick={handleSiriClick}
         />
       </div>
 
       {/* 主要內容區域 */}
-      <div className="flex-1 flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
-            聯絡人管理系統
-          </h1>
-          {activeContactId ? (
-            <div className="text-muted-foreground">
-              <p className="mb-2">
-                目前選擇的聯絡人：
-                {mockContacts.find((c) => c.id === activeContactId)?.name}
-              </p>
-              <p className="text-sm">
-                {
-                  mockContacts.find((c) => c.id === activeContactId)
-                    ?.description
-                }
-              </p>
+      <div className="flex-1 flex bg-background">
+        {isSiriActive ? (
+          // Siri 聊天介面
+          <ChatInterface className="w-full" />
+        ) : (
+          // 原有的聯絡人內容或歡迎頁面
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-foreground mb-4">
+                聯絡人管理系統
+              </h1>
+              {activeContactId ? (
+                <div className="text-muted-foreground">
+                  <p className="mb-2">
+                    目前選擇的聯絡人：
+                    {mockContacts.find((c) => c.id === activeContactId)?.name}
+                  </p>
+                  <p className="text-sm">
+                    {
+                      mockContacts.find((c) => c.id === activeContactId)
+                        ?.description
+                    }
+                  </p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">
+                  請從左側選擇一個聯絡人查看詳細資訊，或與 Siri 開始對話
+                </p>
+              )}
             </div>
-          ) : (
-            <p className="text-muted-foreground">
-              請從左側選擇一個聯絡人查看詳細資訊
-            </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

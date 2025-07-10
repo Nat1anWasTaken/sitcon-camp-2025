@@ -4,13 +4,13 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine
-from .routers import auth, chat
+from src.database import Base, engine
+from src.routers import auth, chat
+
+load_dotenv()
 
 # 建立資料庫表
 Base.metadata.create_all(bind=engine)
-
-load_dotenv()
 
 app = FastAPI(
     title="SITCON Camp 2025 Backend",
@@ -64,4 +64,4 @@ async def hello():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
