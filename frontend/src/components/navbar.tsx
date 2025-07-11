@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth, useLogout } from "@/lib/api/hooks";
+import { useMobileNav } from "@/lib/contexts/mobile-nav-context";
 import { cn } from "@/lib/utils";
-import { LogOut, Settings, User } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -23,13 +24,50 @@ export function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
   const logout = useLogout();
+  const { showContent, setShowContent, activeContactName, isSiriActive } =
+    useMobileNav();
 
   // 判斷是否在認證相關頁面（登入、註冊等）
   const isAuthPage =
     pathname?.startsWith("/login") || pathname?.startsWith("/register");
 
+  // 判斷是否在首頁
+  const isHomePage = pathname === "/";
+
   const handleLogout = () => {
     logout.mutate();
+  };
+
+  const handleBackClick = () => {
+    setShowContent(false);
+  };
+
+  // 決定顯示的標題
+  const getTitle = () => {
+    if (showContent && isHomePage) {
+      if (isSiriActive) {
+        return "Siri AI 助手";
+      }
+      if (activeContactName) {
+        return activeContactName;
+      }
+    }
+    return "SITCON Camp 2025";
+  };
+
+  // 決定顯示的簡短標題（手機版）
+  const getShortTitle = () => {
+    if (showContent && isHomePage) {
+      if (isSiriActive) {
+        return "Siri";
+      }
+      if (activeContactName) {
+        return activeContactName.length > 8
+          ? activeContactName.substring(0, 8) + "..."
+          : activeContactName;
+      }
+    }
+    return "SITCON";
   };
 
   return (
@@ -41,16 +79,30 @@ export function Navbar({ className }: NavbarProps) {
     >
       <div className="w-full px-3 sm:px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Left side - App title and icon */}
+          {/* Left side - App title and icon with back button */}
           <div className="flex items-center space-x-3">
+            {/* Mobile back button */}
+            {showContent && isHomePage && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackClick}
+                className="md:hidden flex items-center justify-center p-2"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
+
             <Link href="/" className="flex items-center space-x-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <span className="text-sm font-bold">S</span>
               </div>
               <span className="hidden font-bold text-xl sm:block">
-                SITCON Camp 2025
+                {getTitle()}
               </span>
-              <span className="font-bold text-xl sm:hidden">SITCON</span>
+              <span className="font-bold text-xl sm:hidden">
+                {getShortTitle()}
+              </span>
             </Link>
           </div>
 

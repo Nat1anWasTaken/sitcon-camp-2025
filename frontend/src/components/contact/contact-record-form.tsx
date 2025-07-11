@@ -93,7 +93,7 @@ export function ContactRecordForm({
             setFormData({ ...formData, category: value })
           }
         >
-          <SelectTrigger className="mt-1">
+          <SelectTrigger className="mt-1 w-full">
             <SelectValue placeholder="選擇記錄分類" />
           </SelectTrigger>
           <SelectContent>

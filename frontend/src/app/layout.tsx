@@ -1,6 +1,7 @@
 import { GlobalAuthWrapper } from "@/components/global-auth-wrapper";
 import { Navbar } from "@/components/navbar";
 import { Providers } from "@/components/providers";
+import { MobileNavProvider } from "@/lib/contexts/mobile-nav-context";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -33,8 +34,10 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <Providers>
             <GlobalAuthWrapper>
-              <Navbar />
-              <main className="flex-1">{children}</main>
+              <MobileNavProvider>
+                <Navbar />
+                <main className="flex-1">{children}</main>
+              </MobileNavProvider>
             </GlobalAuthWrapper>
           </Providers>
         </div>

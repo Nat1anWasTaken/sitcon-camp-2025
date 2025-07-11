@@ -67,17 +67,22 @@ export function ContactInfoEditor({
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="name">姓名</Label>
+        <Label htmlFor="name" className="text-sm font-medium">
+          姓名
+        </Label>
         <Input
           id="name"
           value={editForm.name}
           onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
           className="mt-1"
           disabled={updateContactMutation.isPending}
+          placeholder="輸入聯絡人姓名"
         />
       </div>
       <div>
-        <Label htmlFor="description">描述</Label>
+        <Label htmlFor="description" className="text-sm font-medium">
+          描述
+        </Label>
         <Textarea
           id="description"
           value={editForm.description}
@@ -85,15 +90,16 @@ export function ContactInfoEditor({
             setEditForm({ ...editForm, description: e.target.value })
           }
           placeholder="添加一些關於這個聯絡人的描述..."
-          className="mt-1"
+          className="mt-1 min-h-[80px]"
           disabled={updateContactMutation.isPending}
         />
       </div>
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-2">
         <Button
           onClick={handleSave}
           size="sm"
           disabled={updateContactMutation.isPending}
+          className="w-full sm:w-auto"
         >
           <Save className="h-4 w-4 mr-2" />
           {updateContactMutation.isPending ? "儲存中..." : "儲存"}
@@ -103,6 +109,7 @@ export function ContactInfoEditor({
           onClick={handleCancel}
           size="sm"
           disabled={updateContactMutation.isPending}
+          className="w-full sm:w-auto"
         >
           <X className="h-4 w-4 mr-2" />
           取消
