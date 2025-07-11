@@ -15,7 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/lib/api/hooks/use-auth";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import type { FormEvent } from "react";
 
 export default function ProfilePage() {
@@ -45,7 +45,7 @@ export default function ProfilePage() {
     let parsed: unknown;
     try {
       parsed = JSON.parse(preferences);
-    } catch {
+    } catch (err: unknown) {
       toast.error("偏好設定必須是有效的 JSON 格式");
       return;
     }
@@ -58,7 +58,8 @@ export default function ProfilePage() {
 
     const result = schema.safeParse(parsed);
     if (!result.success) {
-      toast.error(result.error.errors[0]?.message || "偏好設定格式錯誤");
+      const zErr = result.error as ZodError;
+      toast.error(zErr.issues[0]?.message || "偏好設定格式錯誤");
       return;
     }
 

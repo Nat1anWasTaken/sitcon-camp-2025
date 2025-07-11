@@ -22,21 +22,20 @@ export function AuthGuard({ children, fallback }: AuthGuardProps): React.ReactEl
 
   // 如果正在載入，顯示載入狀態
   if (isLoading) {
-    return (
-      fallback || (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">正在載入...</p>
-          </div>
+    const loadingScreen = (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">正在載入...</p>
         </div>
-      )
+      </div>
     );
+    return (fallback ?? loadingScreen) as React.ReactElement;
   }
 
   // 如果未認證，顯示跳轉提示
   if (!isAuthenticated) {
-    return (
+    const redirecting = (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-pulse text-muted-foreground">
@@ -45,8 +44,9 @@ export function AuthGuard({ children, fallback }: AuthGuardProps): React.ReactEl
         </div>
       </div>
     );
+    return redirecting as React.ReactElement;
   }
 
   // 如果已認證，顯示子組件
-  return <>{children}</>;
+  return <>{children}</> as React.ReactElement;
 }
