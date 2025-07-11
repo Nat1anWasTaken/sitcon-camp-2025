@@ -12,8 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ContactApi } from "@/lib/api/contact";
+import { useDeleteAvatar, useUploadAvatar } from "@/lib/api/hooks/use-contact";
 import { Contact } from "@/lib/types/api";
-import { useQueryClient } from "@tanstack/react-query";
 import { Camera, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,10 +29,15 @@ export function AvatarUploadDialog({
   onContactUpdate,
   trigger,
 }: AvatarUploadDialogProps) {
-  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
+
+  // 使用 React Query mutation hooks
+  const uploadAvatarMutation = useUploadAvatar();
+  const deleteAvatarMutation = useDeleteAvatar();
+
+  const isUploading = uploadAvatarMutation.isPending;
+  const isDeleting = deleteAvatarMutation.isPending;
 
   // 處理頭像上傳
   const handleAvatarUpload = async (file: File) => {
@@ -43,7 +48,6 @@ export function AvatarUploadDialog({
       return;
     }
 
-    setIsUploading(true);
     setUploadProgress(0);
 
     // 模擬上傳進度
@@ -58,35 +62,21 @@ export function AvatarUploadDialog({
     }, 200);
 
     try {
-      await ContactApi.uploadAvatar(contact.id, file);
-
-      // 重新載入聯絡人資料以獲取新的頭像資訊
-      const updatedContact = await ContactApi.getContact(contact.id);
-      if (updatedContact.data) {
-        onContactUpdate(updatedContact.data);
-      }
-
-      // 移除舊的查詢數據並無效化，強制重新獲取
-      queryClient.removeQueries({
-        queryKey: ["contact-avatar", contact.id],
+      await uploadAvatarMutation.mutateAsync({
+        contactId: contact.id,
+        avatarFile: file,
       });
-
-      // 如果聯絡人現在有頭像，觸發新的查詢
-      if (updatedContact.data?.avatar_key) {
-        queryClient.invalidateQueries({
-          queryKey: ["contact-avatar", contact.id],
-        });
-      }
 
       setUploadProgress(100);
       toast.success("頭像上傳成功");
       setIsOpen(false);
+
+      // Cache invalidation and contact update are handled by the mutation hook
     } catch (error) {
+      // Error handling is already managed by the mutation hook
       console.error("頭像上傳失敗:", error);
-      toast.error("頭像上傳失敗");
     } finally {
       clearInterval(progressInterval);
-      setIsUploading(false);
       setUploadProgress(0);
     }
   };
@@ -94,27 +84,15 @@ export function AvatarUploadDialog({
   // 處理頭像刪除
   const handleAvatarDelete = async () => {
     try {
-      await ContactApi.deleteAvatar(contact.id);
-
-      // 立即設置查詢數據為 null，確保 UI 立即更新
-      queryClient.setQueryData(["contact-avatar", contact.id], null);
-
-      // 重新載入聯絡人資料
-      const updatedContact = await ContactApi.getContact(contact.id);
-      if (updatedContact.data) {
-        onContactUpdate(updatedContact.data);
-      }
-
-      // 移除查詢以避免重新獲取
-      queryClient.removeQueries({
-        queryKey: ["contact-avatar", contact.id],
-      });
+      await deleteAvatarMutation.mutateAsync(contact.id);
 
       toast.success("頭像已刪除");
       setIsOpen(false);
+
+      // Cache invalidation and contact update are handled by the mutation hook
     } catch (error) {
+      // Error handling is already managed by the mutation hook
       console.error("刪除頭像失敗:", error);
-      toast.error("刪除頭像失敗");
     }
   };
 
@@ -148,7 +126,7 @@ export function AvatarUploadDialog({
                   handleAvatarUpload(file);
                 }
               }}
-              disabled={isUploading}
+              disabled={isUploading || isDeleting}
               className="mt-2"
             />
             <p className="text-sm text-muted-foreground mt-1">
@@ -170,10 +148,10 @@ export function AvatarUploadDialog({
             <Button
               variant="outline"
               onClick={handleAvatarDelete}
-              disabled={isUploading}
+              disabled={isUploading || isDeleting}
               className="w-full"
             >
-              刪除目前頭像
+              {isDeleting ? "刪除中..." : "刪除目前頭像"}
             </Button>
           ) : null}
         </div>

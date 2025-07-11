@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { RecordsApi } from "@/lib/api/records";
+import { useCreateRecord, useUpdateRecord } from "@/lib/api/hooks/use-records";
 import { ContactRecord, RecordCategory } from "@/lib/types/api";
 import { Calendar, FileText, Hash, Heart, Link, Settings } from "lucide-react";
 import { useState } from "react";
@@ -46,7 +46,13 @@ export function ContactRecordForm({
     category: record?.category || ("Communications" as RecordCategory),
     content: record?.content || "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 使用 React Query mutation hooks
+  const createRecordMutation = useCreateRecord();
+  const updateRecordMutation = useUpdateRecord();
+
+  const isSubmitting =
+    createRecordMutation.isPending || updateRecordMutation.isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,27 +62,24 @@ export function ContactRecordForm({
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
       if (record) {
-        // 編輯模式
-        await RecordsApi.updateRecord(record.id, formData);
-        toast.success("記錄已更新");
+        // 編輯模式 - 使用 update mutation
+        await updateRecordMutation.mutateAsync({
+          recordId: record.id,
+          data: formData,
+        });
       } else {
-        // 新增模式
-        await RecordsApi.createRecord({
+        // 新增模式 - 使用 create mutation
+        await createRecordMutation.mutateAsync({
           ...formData,
           contact_id: contactId,
         });
-        toast.success("記錄已新增");
       }
       onSave();
     } catch (error) {
+      // Error handling is already managed by the mutation hooks
       console.error("保存記錄失敗:", error);
-      toast.error("保存記錄失敗");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RecordsApi } from "@/lib/api/records";
+import { useDeleteRecord } from "@/lib/api/hooks/use-records";
 import { ContactRecord, RecordCategory } from "@/lib/types/api";
 import {
   Calendar,
@@ -36,7 +36,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { ContactRecordForm } from "./contact-record-form";
 
 interface ContactRecordsProps {
@@ -83,6 +82,9 @@ export function ContactRecords({
     null
   );
 
+  // 使用 React Query mutation hook
+  const deleteRecordMutation = useDeleteRecord();
+
   // 按分類組織記錄
   const recordsByCategory = records.reduce((acc, record) => {
     if (!acc[record.category]) {
@@ -95,12 +97,12 @@ export function ContactRecords({
   // 處理記錄刪除
   const handleDeleteRecord = async (recordId: number) => {
     try {
-      await RecordsApi.deleteRecord(recordId);
-      toast.success("記錄已刪除");
+      await deleteRecordMutation.mutateAsync(recordId);
+      // Success message and cache invalidation are handled by the mutation hook
       onRecordsUpdate();
     } catch (error) {
+      // Error handling is already managed by the mutation hook
       console.error("刪除記錄失敗:", error);
-      toast.error("刪除記錄失敗");
     }
   };
 
@@ -178,7 +180,11 @@ export function ContactRecords({
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={deleteRecordMutation.isPending}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
@@ -193,8 +199,9 @@ export function ContactRecords({
                     <AlertDialogCancel>取消</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => handleDeleteRecord(record.id)}
+                      disabled={deleteRecordMutation.isPending}
                     >
-                      刪除
+                      {deleteRecordMutation.isPending ? "刪除中..." : "刪除"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
