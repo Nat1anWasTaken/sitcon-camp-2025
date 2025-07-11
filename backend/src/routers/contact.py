@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_active_user
 from ..database import get_db
-from ..file_utils import delete_avatar, get_avatar_file, get_avatar_url, upload_avatar
+from ..file_utils import delete_avatar, get_avatar_file, upload_avatar
 from ..models import Contact, User
 from ..schemas import (
     ContactCreate,
@@ -237,12 +237,8 @@ async def upload_contact_avatar(
     db.commit()
     db.refresh(contact)
 
-    # 生成 URL 用於響應
-    avatar_url = get_avatar_url(avatar_key)
-
     return FileUploadResponse(
         filename=file.filename or "avatar.jpg",
-        url=avatar_url,
         size=file.size or 0,
         content_type=file.content_type or "image/jpeg",
     )
