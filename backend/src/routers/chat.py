@@ -79,8 +79,7 @@ async def chat_endpoint(
     async def sse_generator():
         try:
             # 發送連接建立事件
-            yield "event: connected\n"
-            yield f"data: {json.dumps({'status': 'connected', 'message': '連接已建立'}, ensure_ascii=False)}\n\n"
+            yield "event: connected\ndata: {json.dumps({'status': 'connected', 'message': '連接已建立'}, ensure_ascii=False)}\n\n"
 
             async for chunk in gemini_stream_chat_with_tools(
                 chat_request.history_messages, chat_request.messages, tool_handler
@@ -92,23 +91,19 @@ async def chat_endpoint(
 
                     if chunk.type == "tool_call":
                         # 工具調用事件
-                        yield "event: tool_call\n"
-                        yield f"data: {chunk_json}\n\n"
+                        yield f"event: tool_call\ndata: {chunk_json}\n\n"
                     else:
                         # 文字訊息事件
-                        yield "event: message\n"
-                        yield f"data: {chunk_json}\n\n"
+                        yield f"event: message\ndata: {chunk_json}\n\n"
                 else:
                     # 如果是字串，包裝為文字訊息事件
                     text_chunk = ChatStreamChunk(
                         type="text", content=str(chunk), tool_call=None
                     )
-                    yield "event: message\n"
-                    yield f"data: {text_chunk.model_dump_json()}\n\n"
+                    yield f"event: message\ndata: {text_chunk.model_dump_json()}\n\n"
 
             # 發送完成事件
-            yield "event: done\n"
-            yield f"data: {json.dumps({'status': 'completed', 'message': '對話完成'}, ensure_ascii=False)}\n\n"
+            yield f"event: done\ndata: {json.dumps({'status': 'completed', 'message': '對話完成'}, ensure_ascii=False)}\n\n"
 
         except Exception as e:
             # 發送錯誤事件
