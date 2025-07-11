@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectableItem } from "@/components/motion-wrapper";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateContact } from "@/lib/api/hooks/use-contact";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -71,7 +73,8 @@ export function CreateContactDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children || (
-          <div
+          <SelectableItem
+            isSelected={false}
             className={cn(
               "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
               "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -79,19 +82,42 @@ export function CreateContactDialog({
               className
             )}
           >
-            <Avatar className="size-10">
-              <AvatarFallback className="text-sm font-medium bg-sidebar-accent/50">
-                <Plus className="size-4" />
-              </AvatarFallback>
-            </Avatar>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", damping: 25, stiffness: 400 }}
+            >
+              <Avatar className="size-10">
+                <AvatarFallback className="text-sm font-medium bg-sidebar-accent/50">
+                  <motion.div
+                    whileHover={{ rotate: 90 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 400 }}
+                  >
+                    <Plus className="size-4" />
+                  </motion.div>
+                </AvatarFallback>
+              </Avatar>
+            </motion.div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm">新增聯絡人</h3>
-              <p className="text-xs text-sidebar-foreground/60 mt-0.5">
+              <motion.h3
+                className="font-medium text-sm"
+                transition={{ type: "spring", damping: 25, stiffness: 400 }}
+              >
+                新增聯絡人
+              </motion.h3>
+              <motion.p
+                className="text-xs text-sidebar-foreground/60 mt-0.5"
+                transition={{
+                  type: "spring",
+                  damping: 25,
+                  stiffness: 400,
+                  delay: 0.05,
+                }}
+              >
                 創建新的聊天聯絡人
-              </p>
+              </motion.p>
             </div>
-          </div>
+          </SelectableItem>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

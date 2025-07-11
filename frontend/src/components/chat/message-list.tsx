@@ -1,6 +1,8 @@
 "use client";
 
+import { MotionList } from "@/components/motion-wrapper";
 import { ChatMessage } from "@/lib/types/api";
+import { AnimatePresence } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { MessageItem } from "./message-item";
 import { TypingIndicator } from "./typing-indicator";
@@ -30,16 +32,24 @@ export function MessageList({
   }, [messages, streamContent]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message, index) => (
-        <MessageItem key={index} message={message} />
-      ))}
+    <div className="flex-1 overflow-y-auto p-4">
+      <MotionList className="space-y-4" stagger="normal">
+        <AnimatePresence mode="popLayout">
+          {messages.map((message, index) => (
+            <MessageItem
+              key={`${message.timestamp}-${index}`}
+              message={message}
+              index={index}
+            />
+          ))}
+        </AnimatePresence>
 
-      {/* 顯示打字指示器 */}
-      <TypingIndicator
-        isStreaming={isStreaming || isTyping}
-        streamContent={streamContent}
-      />
+        {/* 顯示打字指示器 */}
+        <TypingIndicator
+          isStreaming={isStreaming || isTyping}
+          streamContent={streamContent}
+        />
+      </MotionList>
 
       <div ref={messagesEndRef} />
     </div>
