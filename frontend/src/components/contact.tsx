@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useContactAvatar } from "@/lib/api/hooks";
 import type { Contact } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,12 @@ export function Contact({
   onClick,
   className,
 }: ContactProps) {
+  // Use the same avatar hook as ContactAvatar component
+  const { data: avatarUrl, isLoading: isAvatarLoading } = useContactAvatar(
+    contact.id,
+    Boolean(contact.avatar_key)
+  );
+
   const getInitials = (name: string | undefined) => {
     if (!name || name.trim().length === 0) {
       return "?";
@@ -40,9 +47,13 @@ export function Contact({
       onClick={onClick}
     >
       <Avatar className="size-10">
-        <AvatarImage src={undefined} alt={contact.name || "Contact"} />
+        <AvatarImage
+          src={avatarUrl || undefined}
+          alt={contact.name || "Contact"}
+          className="object-cover"
+        />
         <AvatarFallback className="text-sm font-medium">
-          {getInitials(contact.name)}
+          {isAvatarLoading ? "..." : getInitials(contact.name)}
         </AvatarFallback>
       </Avatar>
 
