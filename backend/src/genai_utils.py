@@ -242,7 +242,6 @@ class ContactTools:
             ContactTools._create_contact_tool(),
             ContactTools._update_contact_tool(),
             ContactTools._delete_contact_tool(),
-            ContactTools._request_confirmation_tool(),
         ]
 
     @staticmethod
@@ -356,29 +355,6 @@ class ContactTools:
             ]
         )
 
-    @staticmethod
-    def _request_confirmation_tool() -> types.Tool:
-        return types.Tool(
-            function_declarations=[
-                types.FunctionDeclaration(
-                    name="request_user_confirmation",
-                    description="請求用戶確認",
-                    parameters=types.Schema(
-                        type=types.Type.OBJECT,
-                        properties={
-                            "action": types.Schema(
-                                type=types.Type.STRING, description="操作描述"
-                            ),
-                            "details": types.Schema(
-                                type=types.Type.STRING, description="詳細資訊"
-                            ),
-                        },
-                        required=["action", "details"],
-                    ),
-                )
-            ]
-        )
-
 
 class ContactToolHandler:
     """聯絡人工具處理器"""
@@ -398,7 +374,6 @@ class ContactToolHandler:
             "create_contact": self._create_contact,
             "update_contact": self._update_contact,
             "delete_contact": self._delete_contact,
-            "request_user_confirmation": self._request_confirmation,
         }
 
         handler = handlers.get(function_name) if function_name else None
@@ -533,18 +508,6 @@ class ContactToolHandler:
         self.db.commit()
 
         return f"✅ 已成功刪除聯絡人 [{contact_id}] {contact_name}。"
-
-    async def _request_confirmation(self, args: Dict[str, Any]) -> str:
-        """請求用戶確認"""
-        action = args.get("action")
-        details = args.get("details")
-
-        return (
-            f"🤖 我想要執行以下操作，請確認是否同意：\n\n"
-            f"📋 **操作**：{action}\n"
-            f"📝 **詳情**：{details}\n\n"
-            f"請回答「是」或「同意」來確認，或「否」或「取消」來取消操作。"
-        )
 
 
 class RecordTools:
@@ -1052,7 +1015,6 @@ class UnifiedToolHandler:
             "create_contact",
             "update_contact",
             "delete_contact",
-            "request_user_confirmation",
         }
 
         record_tools = {
