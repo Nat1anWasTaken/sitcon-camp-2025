@@ -14,8 +14,7 @@ interface ContactHeaderProps {
 export function ContactHeader({ contact }: ContactHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleContactUpdate = (updatedContact: Contact) => {
-    onContactUpdate(updatedContact);
+  const handleContactUpdate = () => {
     setIsEditing(false);
   };
 
@@ -24,7 +23,7 @@ export function ContactHeader({ contact }: ContactHeaderProps) {
       <CardContent className="p-6">
         <div className="flex items-start space-x-6">
           {/* 頭像區域 */}
-          <ContactAvatar contact={contact} onContactUpdate={onContactUpdate} />
+          <ContactAvatar contact={contact} />
 
           {/* 基本資料區域 */}
           <div className="flex-1">
