@@ -8,20 +8,14 @@ import { AvatarUploadDialog } from "./avatar-upload-dialog";
 
 interface ContactAvatarProps {
   contact: Contact;
-  onContactUpdate: (contact: Contact) => void;
   size?: "sm" | "md" | "lg";
 }
 
-export function ContactAvatar({
-  contact,
-  onContactUpdate,
-  size = "lg",
-}: ContactAvatarProps) {
-  const {
-    data: avatarUrl,
-    isLoading,
-    error,
-  } = useContactAvatar(contact.id, Boolean(contact.avatar_key));
+export function ContactAvatar({ contact, size = "lg" }: ContactAvatarProps) {
+  const { data: avatarUrl, isLoading } = useContactAvatar(
+    contact.id,
+    Boolean(contact.avatar_key)
+  );
 
   // 清理 blob URL 當組件銷毀或 avatarUrl 改變時
   useEffect(() => {
@@ -69,7 +63,7 @@ export function ContactAvatar({
         </AvatarFallback>
       </Avatar>
 
-      <AvatarUploadDialog contact={contact} onContactUpdate={onContactUpdate} />
+      <AvatarUploadDialog contact={contact} />
     </div>
   );
 }

@@ -26,7 +26,7 @@ interface ContactRecordFormProps {
 const CATEGORY_OPTIONS: {
   value: RecordCategory;
   label: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }[] = [
   { value: "Communications", label: "通訊方式", icon: Link },
   { value: "Nicknames", label: "暱稱", icon: Hash },

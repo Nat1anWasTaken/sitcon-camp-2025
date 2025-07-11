@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContact } from "@/lib/api/hooks/use-contact";
 import { useRecordsByContact } from "@/lib/api/hooks/use-records";
-import { Contact } from "@/lib/types/api";
 import { AlertCircle } from "lucide-react";
 import { ContactHeader } from "./contact-header";
 import { ContactRecords } from "./contact-records";
@@ -34,13 +33,6 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
   const records = recordsResponse?.data?.records || [];
   const isLoading = isContactLoading || isRecordsLoading;
   const error = contactError || recordsError;
-
-  // 處理聯絡人更新 - React Query 會自動處理快取更新
-  const handleContactUpdate = (updatedContact: Contact) => {
-    // React Query 的 mutation hooks 會自動更新快取
-    // 這裡可以添加額外的邏輯，比如樂觀更新 UI
-    console.log("聯絡人已更新:", updatedContact);
-  };
 
   // 處理記錄更新
   const handleRecordsUpdate = () => {
@@ -91,7 +83,7 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
   return (
     <div className={`space-y-6 ${className}`}>
       {/* 聯絡人基本資料 */}
-      <ContactHeader contact={contact} onContactUpdate={handleContactUpdate} />
+      <ContactHeader contact={contact} />
 
       {/* 聯絡人記錄 */}
       <ContactRecords

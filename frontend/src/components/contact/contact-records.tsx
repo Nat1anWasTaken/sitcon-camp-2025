@@ -46,7 +46,11 @@ interface ContactRecordsProps {
 
 const CATEGORY_INFO: Record<
   RecordCategory,
-  { label: string; icon: React.ComponentType<any>; color: string }
+  {
+    label: string;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    color: string;
+  }
 > = {
   Communications: {
     label: "通訊方式",

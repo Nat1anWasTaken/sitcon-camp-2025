@@ -9,13 +9,9 @@ import { ContactInfoEditor } from "./contact-info-editor";
 
 interface ContactHeaderProps {
   contact: Contact;
-  onContactUpdate: (contact: Contact) => void;
 }
 
-export function ContactHeader({
-  contact,
-  onContactUpdate,
-}: ContactHeaderProps) {
+export function ContactHeader({ contact }: ContactHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleContactUpdate = (updatedContact: Contact) => {

@@ -20,13 +20,11 @@ import { toast } from "sonner";
 
 interface AvatarUploadDialogProps {
   contact: Contact;
-  onContactUpdate: (contact: Contact) => void;
   trigger?: React.ReactNode;
 }
 
 export function AvatarUploadDialog({
   contact,
-  onContactUpdate,
   trigger,
 }: AvatarUploadDialogProps) {
   const [uploadProgress, setUploadProgress] = useState(0);

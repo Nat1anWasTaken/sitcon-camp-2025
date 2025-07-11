@@ -66,7 +66,7 @@ export function useContactAvatars(
  * 簡化的頭像 hook，用於列表場景
  * 不會立即載入，需要手動觸發
  */
-export function useContactAvatarLazy(contactId: number, hasAvatarKey: boolean) {
+export function useContactAvatarLazy(contactId: number) {
   return useQuery({
     queryKey: ["contact-avatar", contactId],
     queryFn: () => ContactApi.getAvatarImage(contactId),

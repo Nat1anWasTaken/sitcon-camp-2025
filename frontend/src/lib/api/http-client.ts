@@ -115,7 +115,7 @@ export class HttpClient {
         // 只有在有內容時才嘗試解析
         try {
           data = isJson ? await response.json() : await response.text();
-        } catch (parseError) {
+        } catch {
           // 如果解析失敗，嘗試取得文字內容
           const text = await response.text();
           data = text || null;
@@ -127,7 +127,7 @@ export class HttpClient {
 
         // 嘗試從回應資料中取得錯誤訊息
         if (data && typeof data === "object") {
-          const errorData = data as any;
+          const errorData = data as { detail?: string; message?: string };
           errorMessage =
             errorData?.detail || errorData?.message || errorMessage;
         } else if (typeof data === "string" && data) {
