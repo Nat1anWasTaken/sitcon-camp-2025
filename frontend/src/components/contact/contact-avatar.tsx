@@ -61,7 +61,11 @@ export function ContactAvatar({
           className="object-cover"
         />
         <AvatarFallback className={textSizeClasses[size]}>
-          {isLoading ? "..." : contact.name.charAt(0).toUpperCase()}
+          {isLoading
+            ? "..."
+            : contact.name && contact.name.length > 0
+            ? contact.name.charAt(0).toUpperCase()
+            : "?"}
         </AvatarFallback>
       </Avatar>
 
