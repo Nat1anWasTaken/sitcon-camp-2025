@@ -45,7 +45,7 @@ def build_message_contents(
     """將訊息轉換為 Gemini API 格式"""
     contents = []
 
-    # 如果有系統提示，先加入系統訊息
+    # The system prompt is added as user message because the model doesn't support system message
     if system_prompt:
         contents.append(
             types.Content(role="user", parts=[types.Part.from_text(text=system_prompt)])
