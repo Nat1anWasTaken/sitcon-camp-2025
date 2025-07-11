@@ -37,9 +37,19 @@ def get_gemini_client() -> genai.Client:
     return _client
 
 
-def build_message_contents(history: List[ChatMessage], messages: List[ChatMessage]):
+def build_message_contents(
+    history: List[ChatMessage],
+    messages: List[ChatMessage],
+    system_prompt: Optional[str] = None,
+):
     """將訊息轉換為 Gemini API 格式"""
     contents = []
+
+    # 如果有系統提示，先加入系統訊息
+    if system_prompt:
+        contents.append(
+            types.Content(role="user", parts=[types.Part.from_text(text=system_prompt)])
+        )
 
     for msg in history + messages:
         parts = []
@@ -75,10 +85,11 @@ def _process_image_data(data: str) -> bytes:
 async def gemini_stream_chat(
     history: List[ChatMessage],
     messages: List[ChatMessage],
+    system_prompt: Optional[str] = None,
     config: Optional[types.GenerateContentConfig] = None,
 ) -> AsyncGenerator[str, None]:
     """基本的 Gemini 聊天串流"""
-    contents = build_message_contents(history, messages)
+    contents = build_message_contents(history, messages, system_prompt)
 
     if not config:
         config = types.GenerateContentConfig(
@@ -105,10 +116,11 @@ async def gemini_stream_chat_with_tools(
     history: List[ChatMessage],
     messages: List[ChatMessage],
     tool_handler: "ContactToolHandler",
+    system_prompt: Optional[str] = None,
     config: Optional[types.GenerateContentConfig] = None,
 ) -> AsyncGenerator[Union[str, ChatStreamChunk], None]:
     """帶工具功能的 Gemini 聊天"""
-    contents = build_message_contents(history, messages)
+    contents = build_message_contents(history, messages, system_prompt)
     tools = ContactTools.create_tools()
 
     if not config:
@@ -130,7 +142,7 @@ async def gemini_stream_chat_with_tools(
     except Exception as e:
         print(f"工具聊天錯誤: {e}")
         # 降級到普通聊天
-        async for chunk in gemini_stream_chat(history, messages):
+        async for chunk in gemini_stream_chat(history, messages, system_prompt):
             yield ChatStreamChunk(type="text", content=chunk, tool_call=None)
 
 

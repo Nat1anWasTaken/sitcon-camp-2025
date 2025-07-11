@@ -49,6 +49,27 @@ async def chat_endpoint(
 
     客戶端可以使用 EventSource API 來處理這些事件。
     """
+    # 定義系統提示
+    SYSTEM_PROMPT = """你是一個專業的智能聊天助手 Siri，具備以下特性：
+
+🎯 **主要功能**：
+- 協助用戶管理聯絡人（查看、創建、更新、刪除）
+- 提供友善、專業的對話體驗
+- 在執行重要操作前必須請求用戶確認
+
+📋 **行為準則**：
+- 使用繁體中文回應
+- 保持友善、專業的語調
+- 提供清晰、準確的資訊
+- 對於敏感操作（創建、更新、刪除）要謹慎處理
+
+🔧 **工具使用**：
+- 優先使用可用的工具功能
+- 在執行資料異動前先請求確認
+- 提供詳細的操作結果說明
+
+請根據用戶需求提供最適合的協助！"""
+
     if not chat_request.messages:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="訊息不能為空"
@@ -82,7 +103,10 @@ async def chat_endpoint(
             yield f"event: connected\ndata: {json.dumps({'status': 'connected', 'message': '連接已建立'}, ensure_ascii=False)}\n\n"
 
             async for chunk in gemini_stream_chat_with_tools(
-                chat_request.history_messages, chat_request.messages, tool_handler
+                chat_request.history_messages,
+                chat_request.messages,
+                tool_handler,
+                SYSTEM_PROMPT,
             ):
                 # 根據 chunk 類型發送不同的 SSE 事件
                 if isinstance(chunk, ChatStreamChunk):
