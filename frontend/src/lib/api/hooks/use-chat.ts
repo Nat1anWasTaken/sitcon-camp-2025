@@ -1,8 +1,10 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
+  ChatMessage,
   ChatRequest,
   SSEConnectedEvent,
   SSEConnectionState,
@@ -13,35 +15,22 @@ import {
   SSEToolCallEvent,
 } from "../../types/api";
 import { ChatApi, SSEConnection } from "../chat";
-
-/**
- * 聊天訊息項目
- */
-export interface ChatMessageItem {
-  id: string;
-  type: "message" | "tool_call";
-  content: string;
-  timestamp: string;
-  toolCall?: {
-    name: string;
-    arguments: Record<string, unknown>;
-    result: string;
-  };
-}
+import { contactQueryKeys } from "./use-contact";
 
 /**
  * 新的 SSE 聊天 hook
  */
 export const useChat = () => {
+  const queryClient = useQueryClient();
   const [connectionState, setConnectionState] =
     useState<SSEConnectionState>("disconnected");
-  const [messages, setMessages] = useState<ChatMessageItem[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string>("");
   const connectionRef = useRef<SSEConnection | null>(null);
   const streamingContentRef = useRef<string>("");
 
-  const addMessage = useCallback((message: ChatMessageItem) => {
+  const addMessage = useCallback((message: ChatMessage) => {
     setMessages((prev) => [...prev, message]);
   }, []);
 
@@ -82,14 +71,20 @@ export const useChat = () => {
           },
 
           onToolCall: (event: SSEToolCallEvent) => {
-            const messageItem: ChatMessageItem = {
+            const messageItem: ChatMessage = {
               id: generateMessageId(),
+              role: "assistant",
               type: "tool_call",
               content: event.content,
               timestamp: event.timestamp,
               toolCall: event.tool_call,
             };
             addMessage(messageItem);
+
+            // 使聯絡人快取失效並重新獲取
+            console.log("工具調用detected，正在使聯絡人快取失效...");
+            queryClient.invalidateQueries({ queryKey: contactQueryKeys.all });
+
             customHandlers?.onToolCall?.(event);
           },
 
@@ -101,8 +96,9 @@ export const useChat = () => {
 
             // 將累積的串流內容創建為最終訊息
             if (streamingContentRef.current.trim()) {
-              const finalMessage: ChatMessageItem = {
+              const finalMessage: ChatMessage = {
                 id: generateMessageId(),
+                role: "assistant",
                 type: "message",
                 content: streamingContentRef.current,
                 timestamp: new Date().toISOString(),
@@ -128,8 +124,9 @@ export const useChat = () => {
             toast.error(`聊天錯誤: ${event.message}`);
 
             // 添加錯誤訊息到聊天記錄
-            const errorMessage: ChatMessageItem = {
+            const errorMessage: ChatMessage = {
               id: generateMessageId(),
+              role: "assistant",
               type: "message",
               content: `❌ 錯誤: ${event.message}`,
               timestamp: new Date().toISOString(),
@@ -153,8 +150,9 @@ export const useChat = () => {
         toast.error(errorMessage);
 
         // 添加錯誤訊息到聊天記錄
-        const errorMessageItem: ChatMessageItem = {
+        const errorMessageItem: ChatMessage = {
           id: generateMessageId(),
+          role: "assistant",
           type: "message",
           content: `❌ 連接錯誤: ${errorMessage}`,
           timestamp: new Date().toISOString(),
@@ -162,7 +160,7 @@ export const useChat = () => {
         addMessage(errorMessageItem);
       }
     },
-    [isProcessing, addMessage, generateMessageId]
+    [isProcessing, addMessage, generateMessageId, queryClient]
   );
 
   const disconnectChat = useCallback(async () => {

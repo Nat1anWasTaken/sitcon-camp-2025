@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ChatMessage, MessageContent } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { ToolCallDisplay } from "./tool-call-display";
 
 interface MessageItemProps {
   message: ChatMessage;
@@ -49,6 +50,7 @@ function renderContent(content: string | MessageContent[]) {
 
 export function MessageItem({ message }: MessageItemProps) {
   const isUser = message.role === "user";
+  const isToolCall = message.type === "tool_call";
 
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
@@ -78,9 +80,17 @@ export function MessageItem({ message }: MessageItemProps) {
             isUser ? "bg-primary text-primary-foreground" : "bg-muted"
           )}
         >
-          {renderContent(message.content)}
+          <div className="space-y-2">
+            {/* 如果是工具調用，只顯示工具調用指示器 */}
+            {isToolCall && message.toolCall && (
+              <ToolCallDisplay toolCall={message.toolCall} />
+            )}
+
+            {/* 只在非工具調用時顯示訊息內容 */}
+            {!isToolCall && message.content && renderContent(message.content)}
+          </div>
         </Card>
-        {message.timestamp && (
+        {message.timestamp && !isToolCall && (
           <p
             className={cn(
               "text-xs text-muted-foreground mt-1 px-1",

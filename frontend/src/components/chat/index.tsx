@@ -60,16 +60,18 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
   // 監聽 SSE 訊息變化，當聊天完成時自動添加到歷史記錄
   useEffect(() => {
     if (!isProcessing && sseMessages.length > 0) {
-      // 聊天完成，將助手訊息添加到歷史記錄
-      const latestMessage = sseMessages[sseMessages.length - 1];
-      const assistantMessage: ChatMessage = {
-        role: "assistant",
-        content: latestMessage.content,
-        timestamp: latestMessage.timestamp,
-      };
+      // 聊天完成，將所有 SSE 訊息添加到歷史記錄
+      const newAssistantMessages: ChatMessage[] = sseMessages.map((sseMsg) => ({
+        role: sseMsg.role || "assistant",
+        content: sseMsg.content,
+        timestamp: sseMsg.timestamp,
+        type: sseMsg.type,
+        toolCall: sseMsg.toolCall,
+        id: sseMsg.id,
+      }));
 
       setChatHistory((prev) => {
-        const newHistory = [...prev, assistantMessage];
+        const newHistory = [...prev, ...newAssistantMessages];
         saveChatHistory(newHistory);
         return newHistory;
       });
@@ -184,9 +186,12 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
   const allMessages = [
     ...chatHistory,
     ...sseMessages.map((sseMsg) => ({
-      role: "assistant" as const,
+      role: sseMsg.role || "assistant",
       content: sseMsg.content,
       timestamp: sseMsg.timestamp,
+      type: sseMsg.type,
+      toolCall: sseMsg.toolCall,
+      id: sseMsg.id,
     })),
   ];
 

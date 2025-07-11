@@ -117,10 +117,21 @@ export const SUPPORTED_IMAGE_TYPES = [
 
 export type SupportedImageType = (typeof SUPPORTED_IMAGE_TYPES)[number];
 
+// 工具調用資訊（移到這裡以便重用）
+export interface ToolCall {
+  name: string;
+  arguments: Record<string, unknown>;
+  result: string;
+}
+
+// 統一的聊天訊息類型
 export interface ChatMessage {
+  id?: string; // 內部使用的唯一識別符（可選，用於 SSE 訊息）
   role: string; // user, assistant, system
   content: string | MessageContent[]; // 支援純文字或複合內容
   timestamp?: string | null;
+  type?: "message" | "tool_call";
+  toolCall?: ToolCall; // 引用統一的 ToolCall 類型
 }
 
 export interface ChatRequest {
@@ -229,12 +240,7 @@ export type SSEEventType =
   | "done"
   | "error";
 
-// 工具調用資訊
-export interface ToolCall {
-  name: string;
-  arguments: Record<string, unknown>;
-  result: string;
-}
+// 工具調用資訊已移至 Chat 相關型別區域
 
 // SSE 事件資料基礎介面
 export interface SSEEventBase {
