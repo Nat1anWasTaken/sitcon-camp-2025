@@ -30,12 +30,10 @@ def get_gemini_client() -> genai.Client:
 
     if not _client:
         _client = genai.Client(
-            api_key=GEMINI_API_KEY,
+            api_key=gemini_api_key,
         )
 
-    return genai.Client(
-        api_key=GEMINI_API_KEY,
-    )
+    return _client
 
 
 def build_contents(history: List[ChatMessage], messages: List[ChatMessage]):
