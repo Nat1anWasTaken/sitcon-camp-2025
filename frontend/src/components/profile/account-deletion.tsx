@@ -54,7 +54,7 @@ export function AccountDeletion() {
   // 軟刪除帳號
   const softDeleteMutation = useMutation({
     mutationFn: async (data: AccountDeletionData) => {
-      const response = await httpClient.request("/auth/account", { method: "DELETE", body: data });
+      const response = await httpClient.delete("/auth/account", { body: data });
       return response.data;
     },
     onSuccess: () => {
@@ -80,7 +80,7 @@ export function AccountDeletion() {
   // 永久刪除帳號
   const permanentDeleteMutation = useMutation({
     mutationFn: async (data: AccountDeletionData) => {
-      const response = await httpClient.request("/auth/account/permanent", { method: "DELETE", body: data });
+      const response = await httpClient.delete("/auth/account/permanent", { body: data });
       return response.data;
     },
     onSuccess: () => {
