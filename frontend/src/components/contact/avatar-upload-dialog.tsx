@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ContactApi } from "@/lib/api/contact";
 import { Contact } from "@/lib/types/api";
+import { useQueryClient } from "@tanstack/react-query";
 import { Camera, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ export function AvatarUploadDialog({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   // 處理頭像上傳
   const handleAvatarUpload = async (file: File) => {
@@ -58,10 +60,22 @@ export function AvatarUploadDialog({
     try {
       await ContactApi.uploadAvatar(contact.id, file);
 
-      // 重新載入聯絡人資料以獲取新的頭像 URL
+      // 重新載入聯絡人資料以獲取新的頭像資訊
       const updatedContact = await ContactApi.getContact(contact.id);
       if (updatedContact.data) {
         onContactUpdate(updatedContact.data);
+      }
+
+      // 移除舊的查詢數據並無效化，強制重新獲取
+      queryClient.removeQueries({
+        queryKey: ["contact-avatar", contact.id],
+      });
+
+      // 如果聯絡人現在有頭像，觸發新的查詢
+      if (updatedContact.data?.avatar_key) {
+        queryClient.invalidateQueries({
+          queryKey: ["contact-avatar", contact.id],
+        });
       }
 
       setUploadProgress(100);
@@ -82,11 +96,19 @@ export function AvatarUploadDialog({
     try {
       await ContactApi.deleteAvatar(contact.id);
 
+      // 立即設置查詢數據為 null，確保 UI 立即更新
+      queryClient.setQueryData(["contact-avatar", contact.id], null);
+
       // 重新載入聯絡人資料
       const updatedContact = await ContactApi.getContact(contact.id);
       if (updatedContact.data) {
         onContactUpdate(updatedContact.data);
       }
+
+      // 移除查詢以避免重新獲取
+      queryClient.removeQueries({
+        queryKey: ["contact-avatar", contact.id],
+      });
 
       toast.success("頭像已刪除");
       setIsOpen(false);
@@ -144,7 +166,7 @@ export function AvatarUploadDialog({
             </div>
           )}
 
-          {contact.avatar_url || contact.avatar_key ? (
+          {contact.avatar_key ? (
             <Button
               variant="outline"
               onClick={handleAvatarDelete}

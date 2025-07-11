@@ -1,8 +1,9 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ContactApi } from "@/lib/api/contact";
+import { useContactAvatar } from "@/lib/api/hooks";
 import { Contact } from "@/lib/types/api";
+import { useEffect } from "react";
 import { AvatarUploadDialog } from "./avatar-upload-dialog";
 
 interface ContactAvatarProps {
@@ -16,15 +17,28 @@ export function ContactAvatar({
   onContactUpdate,
   size = "lg",
 }: ContactAvatarProps) {
-  const getAvatarUrl = () => {
-    if (contact.avatar_url) {
-      return contact.avatar_url;
+  const {
+    data: avatarUrl,
+    isLoading,
+    error,
+  } = useContactAvatar(contact.id, Boolean(contact.avatar_key));
+
+  // 清理 blob URL 當組件銷毀或 avatarUrl 改變時
+  useEffect(() => {
+    // 當 avatarUrl 改變時，清理舊的 blob URL
+    return () => {
+      if (avatarUrl && avatarUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarUrl);
+      }
+    };
+  }, [avatarUrl]);
+
+  // 當 contact.avatar_key 變為空時，確保清理之前的 avatarUrl
+  useEffect(() => {
+    if (!contact.avatar_key && avatarUrl && avatarUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(avatarUrl);
     }
-    if (contact.avatar_key) {
-      return ContactApi.getAvatarImageUrl(contact.id);
-    }
-    return undefined;
-  };
+  }, [contact.avatar_key, avatarUrl]);
 
   const sizeClasses = {
     sm: "h-12 w-12",
@@ -42,12 +56,12 @@ export function ContactAvatar({
     <div className="relative">
       <Avatar className={sizeClasses[size]}>
         <AvatarImage
-          src={getAvatarUrl()}
+          src={avatarUrl || undefined}
           alt={contact.name}
           className="object-cover"
         />
         <AvatarFallback className={textSizeClasses[size]}>
-          {contact.name.charAt(0).toUpperCase()}
+          {isLoading ? "..." : contact.name.charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
 

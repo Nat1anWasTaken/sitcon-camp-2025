@@ -37,7 +37,7 @@ export function Contact({
       onClick={onClick}
     >
       <Avatar className="size-10">
-        <AvatarImage src={contact.avatar_url || undefined} alt={contact.name} />
+        <AvatarImage src={undefined} alt={contact.name} />
         <AvatarFallback className="text-sm font-medium">
           {getInitials(contact.name)}
         </AvatarFallback>

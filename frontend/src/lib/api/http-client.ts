@@ -71,7 +71,11 @@ export class HttpClient {
 
     // 處理請求體
     if (config.body && config.method !== "GET") {
-      if (headers["Content-Type"]?.includes("application/json")) {
+      if (config.body instanceof FormData) {
+        // 直接使用 FormData，移除 Content-Type 讓瀏覽器自動設置
+        requestOptions.body = config.body;
+        delete headers["Content-Type"];
+      } else if (headers["Content-Type"]?.includes("application/json")) {
         requestOptions.body = JSON.stringify(config.body);
       } else if (
         headers["Content-Type"]?.includes("application/x-www-form-urlencoded")
@@ -173,6 +177,55 @@ export class HttpClient {
    */
   async delete<T>(endpoint: string, config?: Omit<RequestConfig, "method">) {
     return this.request<T>(endpoint, { ...config, method: "DELETE" });
+  }
+
+  /**
+   * 獲取二進制數據 (Blob)
+   */
+  async getBlob(
+    endpoint: string,
+    config?: Omit<RequestConfig, "method">
+  ): Promise<Blob | null> {
+    const url = `${config?.baseURL || this.baseURL}${endpoint}`;
+
+    // 合併 headers (不包含 Content-Type 和 Accept，因為我們要獲取二進制數據)
+    const headers: Record<string, string> = {};
+
+    // 添加授權 header
+    if (this.defaultHeaders["Authorization"]) {
+      headers["Authorization"] = this.defaultHeaders["Authorization"];
+    }
+
+    if (config?.token) {
+      headers["Authorization"] = `Bearer ${config.token}`;
+    }
+
+    // 合併其他自定義 headers
+    if (config?.headers) {
+      Object.assign(headers, config.headers);
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // 資源不存在
+        }
+        throw new ApiError(
+          `HTTP ${response.status}: ${response.statusText}`,
+          response.status
+        );
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.error("獲取二進制數據失敗:", error);
+      throw error;
+    }
   }
 }
 

@@ -162,7 +162,6 @@ export interface Contact {
   name: string;
   description?: string | null;
   avatar_key?: string | null;
-  avatar_url?: string | null;
   user_id: number;
   created_at: string;
   updated_at: string;
