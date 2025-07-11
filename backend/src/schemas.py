@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field, computed_field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class RecordCategoryEnum(str, Enum):
@@ -203,20 +203,6 @@ class ContactResponse(ContactBase):
     created_at: datetime
     updated_at: Optional[datetime]
 
-    @computed_field
-    @property
-    def avatar_url(self) -> Optional[str]:
-        """
-        動態生成頭像 URL
-        """
-        if not self.avatar_key:
-            return None
-
-        bucket_name = os.getenv("S3_BUCKET", "my-bucket")
-        public_url = os.getenv("S3_ENDPOINT", "http://localhost:9000")
-
-        return f"{public_url}/{bucket_name}/{self.avatar_key}"
-
     class Config:
         from_attributes = True
 
@@ -238,7 +224,6 @@ class FileUploadResponse(BaseModel):
     """
 
     filename: str
-    url: str
     size: int
     content_type: str
 

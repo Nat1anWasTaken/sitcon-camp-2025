@@ -125,7 +125,6 @@ async def upload_avatar(
 
     # 獲取配置
     bucket_name = os.getenv("S3_BUCKET", "my-bucket")
-    public_url = os.getenv("S3_ENDPOINT", "http://localhost:9000")
 
     # 確保 bucket 存在
     ensure_bucket_exists(bucket_name)
@@ -172,25 +171,6 @@ async def upload_avatar(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"處理文件時發生錯誤: {str(e)}",
         )
-
-
-def get_avatar_url(avatar_key: str) -> str:
-    """
-    從 avatar_key 生成完整的 URL
-
-    Args:
-        avatar_key: MinIO 中的對象鍵
-
-    Returns:
-        str: 完整的頭像 URL
-    """
-    if not avatar_key:
-        return ""
-
-    bucket_name = os.getenv("S3_BUCKET", "my-bucket")
-    public_url = os.getenv("S3_ENDPOINT", "http://localhost:9000")
-
-    return f"{public_url}/{bucket_name}/{avatar_key}"
 
 
 def delete_avatar(avatar_key: str) -> None:
