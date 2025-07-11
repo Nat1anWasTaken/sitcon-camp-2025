@@ -142,3 +142,79 @@ export interface ImageFile {
   mimeType: SupportedImageType;
   size: number;
 }
+
+// ============== 聯絡人相關型別 ==============
+
+// 聯絡人資料型別
+export interface Contact {
+  id: number;
+  name: string;
+  description?: string | null;
+  avatar_key?: string | null;
+  avatar_url?: string | null;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// 創建聊絡人請求
+export interface ContactCreate {
+  name: string;
+  description?: string | null;
+}
+
+// 更新聯絡人請求
+export interface ContactUpdate {
+  name?: string;
+  description?: string | null;
+}
+
+// 聯絡人列表響應
+export interface ContactListResponse {
+  contacts: Contact[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+// 聯絡人查詢參數
+export interface ContactQueryParams {
+  skip?: number;
+  limit?: number;
+  search?: string;
+}
+
+// 頭像上傳響應
+export interface AvatarUploadResponse {
+  filename: string;
+  url: string;
+  size: number;
+  content_type: string;
+}
+
+// 支援的頭像文件格式
+export const SUPPORTED_AVATAR_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+] as const;
+
+export type SupportedAvatarType = (typeof SUPPORTED_AVATAR_TYPES)[number];
+
+// 頭像上傳配置
+export interface AvatarUploadConfig {
+  maxFileSize: number; // 5MB
+  supportedTypes: readonly string[];
+  targetSize: { width: number; height: number }; // 512x512
+}
+
+// 聯絡人 API 端點常數
+export const CONTACT_ENDPOINTS = {
+  contacts: "/contacts/",
+  contactsWithAvatar: "/contacts/with-avatar",
+  contactById: (id: number) => `/contacts/${id}`,
+  contactAvatar: (id: number) => `/contacts/${id}/avatar`,
+  contactAvatarImage: (id: number) => `/contacts/${id}/avatar/image`,
+} as const;

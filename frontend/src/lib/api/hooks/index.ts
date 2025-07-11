@@ -1,2 +1,3 @@
-export { useAuth, useLogin, useLogout, useRegister } from "./use-auth";
-export { useStreamChat } from "./use-chat";
+export * from "./use-auth";
+export * from "./use-chat";
+export * from "./use-contact";
