@@ -50,7 +50,6 @@ htmlcov/
 .env.test.local
 .env.production.local
 README.md
-*.md
 Dockerfile
 .dockerignore
 docker-compose.yml
