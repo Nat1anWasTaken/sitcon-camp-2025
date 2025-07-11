@@ -44,7 +44,7 @@ async def root():
     根路徑 - 返回 API 基本資訊
     """
     return {
-        "version": "0.1.0",
+        "version": "0.1.1",
         "status": "running",
     }
 
