@@ -42,49 +42,49 @@ services:
         - action: rebuild
           path: ./backend/main.py
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: sitcon-frontend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NEXT_PUBLIC_API_URL=http://localhost:8000
-  #     - NODE_ENV=development
-  #     - NEXT_TELEMETRY_DISABLED=1
-  #   env_file:
-  #     - frontend.env
-  #   networks:
-  #     - sitcon-network
-  #   depends_on:
-  #     - backend
-  #   restart: unless-stopped
-  #   develop:
-  #     watch:
-  #       - action: sync
-  #         path: ./frontend/src
-  #         target: /app/src
-  #         ignore:
-  #           - node_modules/
-  #           - .next/
-  #           - .git/
-  #       - action: sync
-  #         path: ./frontend/next.config.ts
-  #         target: /app/next.config.ts
-  #       - action: sync
-  #         path: ./frontend/tsconfig.json
-  #         target: /app/tsconfig.json
-  #       - action: sync
-  #         path: ./frontend/postcss.config.mjs
-  #         target: /app/postcss.config.mjs
-  #       - action: sync
-  #         path: ./frontend/components.json
-  #         target: /app/components.json
-  #       - action: rebuild
-  #         path: ./frontend/package.json
-  #       - action: rebuild
-  #         path: ./frontend/pnpm-lock.yaml
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sitcon-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - frontend.env
+    networks:
+      - sitcon-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - .next/
+            - .git/
+        - action: sync
+          path: ./frontend/next.config.ts
+          target: /app/next.config.ts
+        - action: sync
+          path: ./frontend/tsconfig.json
+          target: /app/tsconfig.json
+        - action: sync
+          path: ./frontend/postcss.config.mjs
+          target: /app/postcss.config.mjs
+        - action: sync
+          path: ./frontend/components.json
+          target: /app/components.json
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/pnpm-lock.yaml
 
   minio:
     image: minio/minio:latest

@@ -20,8 +20,16 @@ cd sitcon-camp-2025
 
 2. 修改環境變數
 
-   - **前端**：編輯 `docker-compose.yml` 中 `frontend` 服務的環境變數
-   - **後端**：編輯 `docker-compose.yml` 中 `backend` 服務的環境變數
+   將 `frontend.env.example` 和 `backend.env.example` 複製為 `frontend.env` 和 `backend.env`
+   編輯 `frontend.env` 和 `backend.env` 中的環境變數
+   **請只更動你看得懂的部分，剩下的維持原樣**
+
+   例如：
+
+   ```bash
+   cp frontend.env.example frontend.env
+   cp backend.env.example backend.env
+   ```
 
 3. 確保您的主機已安裝 Docker 並執行：
 
