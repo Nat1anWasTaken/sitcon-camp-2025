@@ -7,7 +7,7 @@ import type { Contact } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Contact as ContactComponent } from "./contact";
-import { CreateContactDialog } from "./create-contact-dialog";
+import { CreateContactDialog } from "./contact/create-contact-dialog";
 import { Siri } from "./siri";
 
 interface SidebarProps {
