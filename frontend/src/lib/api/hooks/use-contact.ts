@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   ContactCreate,
   ContactQueryParams,
@@ -218,7 +218,7 @@ export function useValidateAvatarFile() {
 }
 
 /**
- * 聯絡人搜索的 hook（帶防抖）
+ * 聯絡人搜索的 hook（帶防抖）- 穩定版本
  */
 export function useContactSearch(searchTerm: string, debounceMs = 300) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
@@ -231,8 +231,47 @@ export function useContactSearch(searchTerm: string, debounceMs = 300) {
     return () => clearTimeout(timer);
   }, [searchTerm, debounceMs]);
 
-  return useContacts({
-    search: debouncedSearchTerm || undefined,
-    limit: 20,
+  // 使用穩定的查詢鍵獲取所有聯絡人
+  const allContactsQuery = useQuery({
+    queryKey: contactQueryKeys.list({ limit: 100 }), // 使用固定的查詢鍵
+    queryFn: () => ContactApi.getContacts({ limit: 100 }),
+    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
+    refetchOnWindowFocus: false,
   });
+
+  // 在客戶端進行過濾
+  const filteredData = useMemo(() => {
+    if (!allContactsQuery.data?.data?.contacts) {
+      return allContactsQuery.data;
+    }
+
+    if (!debouncedSearchTerm) {
+      return allContactsQuery.data;
+    }
+
+    const filteredContacts = allContactsQuery.data.data.contacts.filter(
+      (contact) =>
+        contact.name
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        (contact.description &&
+          contact.description
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()))
+    );
+
+    return {
+      ...allContactsQuery.data,
+      data: {
+        ...allContactsQuery.data.data,
+        contacts: filteredContacts,
+        total: filteredContacts.length,
+      },
+    };
+  }, [allContactsQuery.data, debouncedSearchTerm]);
+
+  return {
+    ...allContactsQuery,
+    data: filteredData,
+  };
 }
