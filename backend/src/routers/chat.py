@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from ..ai import UnifiedToolHandler, gemini_stream_chat_with_tools
 from ..auth import get_current_active_user, get_user_contacts, get_user_records
 from ..database import get_db
-from ..genai_utils import UnifiedToolHandler, gemini_stream_chat_with_tools
 from ..models import Contact, Record, RecordCategory, User
 from ..prompt_manager import prompt_manager
 from ..schemas import ChatRequest, ChatStreamChunk, ImageContent
