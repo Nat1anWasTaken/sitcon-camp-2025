@@ -6,13 +6,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth, useLogout } from "@/lib/api/hooks";
 import { useMobileNav } from "@/lib/contexts/mobile-nav-context";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, LogOut, Settings, User } from "lucide-react";
+import { ArrowLeft, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -128,15 +127,6 @@ export function Navbar({ className }: NavbarProps) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>個人資料</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>設定</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600 focus:text-red-600"
                     onClick={handleLogout}
