@@ -1,13 +1,15 @@
 import json
+from re import search
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from ..auth import get_current_active_user
+from ..auth import get_current_active_user, get_user_contacts, get_user_records
 from ..database import get_db
-from ..genai_utils import ContactToolHandler, gemini_stream_chat_with_tools
-from ..models import User
+from ..genai_utils import UnifiedToolHandler, gemini_stream_chat_with_tools
+from ..models import Contact, Record, RecordCategory, User
 from ..prompt_manager import prompt_manager
 from ..schemas import ChatRequest, ChatStreamChunk, ImageContent
 
@@ -19,9 +21,11 @@ async def chat_endpoint(
     chat_request: ChatRequest,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
+    contacts: List[Contact] = Depends(get_user_contacts),
+    records: List[Record] = Depends(get_user_records),
 ):
     """
-    智能聊天助手端點 - 支援聯絡人管理工具功能 (Server-Sent Events)
+    智能聊天助手端點 - 支援聯絡人和記錄管理工具功能 (Server-Sent Events)
 
     這個端點提供了一個智能助手，可以幫助用戶：
     - 進行一般對話
@@ -29,6 +33,17 @@ async def chat_endpoint(
     - 創建新聯絡人
     - 更新現有聯絡人資訊
     - 刪除不需要的聯絡人
+    - 查看和管理聯絡人的記錄
+    - 創建、更新、刪除記錄
+    - 按分類和內容搜索記錄
+
+    支援的記錄分類：
+    - Communications: 通訊記錄
+    - Nicknames: 暱稱
+    - Memories: 回憶
+    - Preferences: 偏好
+    - Plan: 計劃
+    - Other: 其他
 
     在執行任何創建、更新或刪除操作前，助手會先請求用戶確認。
 
@@ -52,7 +67,16 @@ async def chat_endpoint(
     """
 
     # 使用 prompt manager 讀取系統 prompt
-    system_prompt = prompt_manager.get_siri_prompt()
+    system_prompt = prompt_manager.get_siri_prompt().replace(
+        "%user_contacts%",
+        "\n".join(
+            [
+                f"{contact.name} (Also known as {', '.join([record.content for record in contact.records if record.category == RecordCategory.NICKNAMES])}) - {contact.description}"
+                for contact in contacts
+            ]
+        )
+        or "使用者目前沒有任何聯絡人，請告訴使用者透過左側的按鈕新增聯絡人",
+    )
 
     if not chat_request.messages:
         raise HTTPException(
@@ -78,8 +102,8 @@ async def chat_endpoint(
                             detail=f"不支援的圖片格式: {content_item.mime_type}。支援的格式: {', '.join(supported_types)}",
                         )
 
-    # 創建聯絡人工具處理器
-    tool_handler = ContactToolHandler(db, current_user)
+    # 創建統一工具處理器（支援聯絡人和記錄）
+    tool_handler = UnifiedToolHandler(db, current_user)
 
     async def sse_generator():
         try:

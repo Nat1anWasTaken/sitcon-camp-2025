@@ -5,10 +5,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from .database import get_db
-from .models import User
+from .models import Contact, Record, User
 from .schemas import TokenData
 
 # 密碼加密配置
@@ -113,3 +113,30 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="用戶帳號已被停用")
     return current_user
+
+
+async def get_user_contacts(
+    current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
+):
+    query = (
+        db.query(Contact)
+        .filter(Contact.user_id == current_user.id)
+        .options(selectinload(Contact.records))
+    )
+
+    contacts = query.all()
+
+    return contacts
+
+
+async def get_user_records(
+    current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
+):
+    """
+    獲取當前用戶的所有記錄
+    """
+    query = db.query(Record).join(Contact).filter(Contact.user_id == current_user.id)
+
+    records = query.all()
+
+    return records
