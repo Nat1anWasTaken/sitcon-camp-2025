@@ -79,7 +79,7 @@ async def chat_endpoint(
     async def sse_generator():
         try:
             # 發送連接建立事件
-            yield "event: connected\ndata: {json.dumps({'status': 'connected', 'message': '連接已建立'}, ensure_ascii=False)}\n\n"
+            yield f"event: connected\ndata: {json.dumps({'status': 'connected', 'message': '連接已建立'}, ensure_ascii=False)}\n\n"
 
             async for chunk in gemini_stream_chat_with_tools(
                 chat_request.history_messages, chat_request.messages, tool_handler
