@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   cleanupImageUrls,
   extractImagesFromClipboard,
@@ -160,7 +161,7 @@ export function ChatInput({
   );
 
   // 處理鍵盤事件
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSendMessage();
@@ -213,11 +214,11 @@ export function ChatInput({
 
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <textarea
+            <Textarea
               ref={inputRef}
               value={inputMessage}
               onChange={(e) => onInputChange(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               onInput={handleInput}
               onPaste={handlePaste}
               placeholder={
@@ -225,7 +226,7 @@ export function ChatInput({
                   ? "添加描述文字（可選）..."
                   : "輸入訊息或貼上圖片..."
               }
-              className="w-full p-3 pr-24 border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[50px] max-h-32"
+              className="w-full p-3 pr-24 resize-none min-h-[50px] max-h-32"
               disabled={isStreaming || isProcessingImages}
               rows={1}
               style={{

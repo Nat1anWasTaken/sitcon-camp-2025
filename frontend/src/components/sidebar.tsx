@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -46,17 +47,17 @@ export function Sidebar({
 
         {/* Search Input */}
         <div className="relative">
-          <input
+          <Input
             type="text"
             placeholder="搜尋聯絡人..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={cn(
-              "w-full px-3 py-2 text-sm rounded-md",
+              "w-full px-3 py-2 text-sm",
               "bg-sidebar-accent text-sidebar-accent-foreground",
-              "border border-sidebar-border",
+              "border-sidebar-border",
               "placeholder:text-sidebar-foreground/50",
-              "focus:outline-none focus:ring-2 focus:ring-sidebar-ring"
+              "focus:ring-2 focus:ring-sidebar-ring"
             )}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
