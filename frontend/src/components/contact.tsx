@@ -1,17 +1,11 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { Contact } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 
-export interface ContactData {
-  id: string;
-  name: string;
-  avatar?: string;
-  description?: string;
-}
-
 interface ContactProps {
-  contact: ContactData;
+  contact: Contact;
   isActive?: boolean;
   onClick?: () => void;
   className?: string;
@@ -43,7 +37,7 @@ export function Contact({
       onClick={onClick}
     >
       <Avatar className="size-10">
-        <AvatarImage src={contact.avatar} alt={contact.name} />
+        <AvatarImage src={contact.avatar_url || undefined} alt={contact.name} />
         <AvatarFallback className="text-sm font-medium">
           {getInitials(contact.name)}
         </AvatarFallback>

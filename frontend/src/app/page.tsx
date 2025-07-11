@@ -1,64 +1,34 @@
 "use client";
 
 import { ChatInterface } from "@/components/chat";
-import { ContactData } from "@/components/contact";
 import { Sidebar } from "@/components/sidebar";
+import type { Contact } from "@/lib/types/api";
 import { useState } from "react";
 
-// 示例聯絡人資料
-const mockContacts: ContactData[] = [
-  {
-    id: "1",
-    name: "張小明",
-    avatar: "/avatars/zhang.jpg",
-    description: "軟體工程師，專精於前端開發",
-  },
-  {
-    id: "2",
-    name: "李小華",
-    avatar: "/avatars/li.jpg",
-    description: "UI/UX 設計師",
-  },
-  {
-    id: "3",
-    name: "王大明",
-    description: "專案經理，負責產品規劃",
-  },
-  {
-    id: "4",
-    name: "陳小美",
-    avatar: "/avatars/chen.jpg",
-    description: "後端工程師，資料庫專家",
-  },
-  {
-    id: "5",
-    name: "林志強",
-    description: "DevOps 工程師",
-  },
-];
+// 定義 Siri 的特殊 ID
+const SIRI_ID = -1;
 
 export default function Home() {
-  const [activeContactId, setActiveContactId] = useState<string>();
-  const [isSiriActive, setIsSiriActive] = useState<boolean>(false);
+  const [activeContactId, setActiveContactId] = useState<number>();
 
-  const handleContactClick = (contact: ContactData) => {
+  const handleContactClick = (contact: Contact) => {
     setActiveContactId(contact.id);
-    setIsSiriActive(false); // 取消Siri選擇
     console.log("選擇的聯絡人:", contact.name);
   };
 
   const handleSiriClick = () => {
-    setIsSiriActive(true);
-    setActiveContactId(undefined); // 取消聯絡人選擇
+    setActiveContactId(SIRI_ID);
     console.log("選擇了 Siri AI 助手");
   };
+
+  // 檢查是否選擇了 Siri
+  const isSiriActive = activeContactId === SIRI_ID;
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       {/* 側邊欄 */}
       <div className="w-80">
         <Sidebar
-          contacts={mockContacts}
           activeContactId={activeContactId}
           isSiriActive={isSiriActive}
           onContactClick={handleContactClick}
@@ -78,18 +48,10 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-foreground mb-4">
                 聯絡人管理系統
               </h1>
-              {activeContactId ? (
+              {activeContactId && activeContactId !== SIRI_ID ? (
                 <div className="text-muted-foreground">
-                  <p className="mb-2">
-                    目前選擇的聯絡人：
-                    {mockContacts.find((c) => c.id === activeContactId)?.name}
-                  </p>
-                  <p className="text-sm">
-                    {
-                      mockContacts.find((c) => c.id === activeContactId)
-                        ?.description
-                    }
-                  </p>
+                  <p className="mb-2">目前選擇的聯絡人 ID：{activeContactId}</p>
+                  <p className="text-sm">聯絡人詳細資訊將在此顯示</p>
                 </div>
               ) : (
                 <p className="text-muted-foreground">
