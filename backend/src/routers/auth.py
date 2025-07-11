@@ -185,7 +185,7 @@ async def update_user_preferences(
             )
     
     # 更新用戶資料
-    update_data = preferences_data.dict(exclude_unset=True)
+    update_data = preferences_data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         if field == "email":
             setattr(current_user, field, str(value))
