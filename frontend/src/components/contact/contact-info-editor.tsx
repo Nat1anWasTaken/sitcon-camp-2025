@@ -30,6 +30,11 @@ export function ContactInfoEditor({
   const updateContactMutation = useUpdateContact();
 
   const handleSave = async () => {
+    if (!editForm.name.trim()) {
+      toast.error("聯絡人姓名不能為空");
+      return;
+    }
+
     try {
       const result = await updateContactMutation.mutateAsync({
         contactId: contact.id,
@@ -39,13 +44,15 @@ export function ContactInfoEditor({
       // 通知父組件聯絡人已更新
       if (result.data) {
         onContactUpdate(result.data);
+        toast.success("聯絡人資料已更新");
+      } else {
+        console.warn("更新成功但未返回數據:", result);
+        toast.success("聯絡人資料已更新");
       }
-
-      // 成功訊息由 mutation hook 處理
-      toast.success("聯絡人資料已更新");
     } catch (error) {
-      // 錯誤處理由 mutation hook 處理
+      // 錯誤處理由 mutation hook 處理，這裡添加額外的用戶提示
       console.error("更新失敗:", error);
+      toast.error("更新失敗，請稍後再試");
     }
   };
 

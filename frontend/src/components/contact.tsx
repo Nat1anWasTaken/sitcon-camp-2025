@@ -17,7 +17,10 @@ export function Contact({
   onClick,
   className,
 }: ContactProps) {
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name || name.trim().length === 0) {
+      return "?";
+    }
     return name
       .split(" ")
       .map((word) => word.charAt(0))
@@ -37,14 +40,16 @@ export function Contact({
       onClick={onClick}
     >
       <Avatar className="size-10">
-        <AvatarImage src={undefined} alt={contact.name} />
+        <AvatarImage src={undefined} alt={contact.name || "Contact"} />
         <AvatarFallback className="text-sm font-medium">
           {getInitials(contact.name)}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm truncate">{contact.name}</h3>
+        <h3 className="font-medium text-sm truncate">
+          {contact.name || "未命名聯絡人"}
+        </h3>
         {contact.description && (
           <p className="text-xs text-sidebar-foreground/60 truncate mt-0.5">
             {contact.description}

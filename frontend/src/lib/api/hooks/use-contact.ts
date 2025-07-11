@@ -40,7 +40,7 @@ export function useContact(contactId: number) {
     queryKey: contactQueryKeys.detail(contactId),
     queryFn: () => ContactApi.getContact(contactId),
     enabled: !!contactId,
-    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
+    staleTime: 1000 * 30, // 降低到 30 秒，確保更新後能快速反映
   });
 }
 
@@ -93,12 +93,19 @@ export function useUpdateContact() {
       contactId: number;
       contactData: ContactUpdate;
     }) => ContactApi.updateContact(contactId, contactData),
-    onSuccess: (data, variables) => {
-      // 更新快取中的聯絡人資料
-      queryClient.setQueryData(contactQueryKeys.detail(variables.contactId), {
-        data,
+    onSuccess: (response, variables) => {
+      // 1. 先更新特定聯絡人的快取數據
+      queryClient.setQueryData(
+        contactQueryKeys.detail(variables.contactId),
+        response
+      );
+
+      // 2. 立即觸發該聯絡人的查詢失效，確保重新獲取最新數據
+      queryClient.invalidateQueries({
+        queryKey: contactQueryKeys.detail(variables.contactId),
       });
-      // 使列表查詢失效
+
+      // 3. 使列表查詢失效
       queryClient.invalidateQueries({ queryKey: contactQueryKeys.lists() });
     },
   });
@@ -138,9 +145,13 @@ export function useUploadAvatar() {
       avatarFile: File;
     }) => ContactApi.uploadAvatar(contactId, avatarFile),
     onSuccess: (_, { contactId }) => {
-      // 使該聯絡人的查詢失效
+      // 使該聯絡人的查詢失效，確保獲取最新的 avatar_key
       queryClient.invalidateQueries({
         queryKey: contactQueryKeys.detail(contactId),
+      });
+      // 使頭像查詢失效
+      queryClient.invalidateQueries({
+        queryKey: contactQueryKeys.avatar(contactId),
       });
       // 使列表查詢失效
       queryClient.invalidateQueries({ queryKey: contactQueryKeys.lists() });
@@ -157,9 +168,13 @@ export function useDeleteAvatar() {
   return useMutation({
     mutationFn: ContactApi.deleteAvatar,
     onSuccess: (_, contactId) => {
-      // 使該聯絡人的查詢失效
+      // 使該聯絡人的查詢失效，確保 avatar_key 被清除
       queryClient.invalidateQueries({
         queryKey: contactQueryKeys.detail(contactId),
+      });
+      // 移除頭像快取
+      queryClient.removeQueries({
+        queryKey: contactQueryKeys.avatar(contactId),
       });
       // 使列表查詢失效
       queryClient.invalidateQueries({ queryKey: contactQueryKeys.lists() });

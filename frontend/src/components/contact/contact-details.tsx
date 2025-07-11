@@ -38,7 +38,8 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
   // 處理聯絡人更新 - React Query 會自動處理快取更新
   const handleContactUpdate = (updatedContact: Contact) => {
     // React Query 的 mutation hooks 會自動更新快取
-    // 這個函數現在主要用於通知子組件
+    // 這裡可以添加額外的邏輯，比如樂觀更新 UI
+    console.log("聯絡人已更新:", updatedContact);
   };
 
   // 處理記錄更新

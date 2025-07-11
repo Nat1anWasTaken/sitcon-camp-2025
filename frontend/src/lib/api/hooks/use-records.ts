@@ -31,7 +31,7 @@ export function useRecords(params?: RecordQueryParams) {
   return useQuery({
     queryKey: recordQueryKeys.list(params),
     queryFn: () => RecordsApi.getRecords(params),
-    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
+    staleTime: 1000 * 30, // 降低到 30 秒，確保更新後能快速反映
   });
 }
 
@@ -46,7 +46,7 @@ export function useRecordsByContact(
     queryKey: recordQueryKeys.byContact(contactId, params),
     queryFn: () => RecordsApi.getRecordsByContact(contactId, params),
     enabled: !!contactId,
-    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
+    staleTime: 1000 * 30, // 降低到 30 秒，確保更新後能快速反映
   });
 }
 
@@ -58,7 +58,7 @@ export function useRecord(recordId: number) {
     queryKey: recordQueryKeys.detail(recordId),
     queryFn: () => RecordsApi.getRecord(recordId),
     enabled: !!recordId,
-    staleTime: 1000 * 60 * 5, // 5 分鐘內不重新請求
+    staleTime: 1000 * 30, // 降低到 30 秒，確保更新後能快速反映
   });
 }
 
@@ -123,13 +123,18 @@ export function useUpdateRecord() {
         return;
       }
 
-      // 更新特定記錄的快取
+      // 1. 更新特定記錄的快取
       queryClient.setQueryData(
         recordQueryKeys.detail(variables.recordId),
         response
       );
 
-      // 使相關查詢失效
+      // 2. 立即觸發該記錄的查詢失效
+      queryClient.invalidateQueries({
+        queryKey: recordQueryKeys.detail(variables.recordId),
+      });
+
+      // 3. 使相關查詢失效
       queryClient.invalidateQueries({ queryKey: recordQueryKeys.lists() });
       if (response.data?.contact_id) {
         queryClient.invalidateQueries({

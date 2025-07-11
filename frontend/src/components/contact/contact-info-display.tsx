@@ -25,7 +25,7 @@ export function ContactInfoDisplay({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{contact.name}</h2>
+        <h2 className="text-2xl font-bold">{contact.name || "未命名聯絡人"}</h2>
         <Button variant="outline" size="sm" onClick={onEdit}>
           <Edit className="h-4 w-4 mr-2" />
           編輯
