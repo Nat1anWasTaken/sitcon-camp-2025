@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ContactApi } from "@/lib/api/contact";
+import { useUpdateContact } from "@/lib/api/hooks/use-contact";
 import { Contact } from "@/lib/types/api";
 import { Save, X } from "lucide-react";
 import { useState } from "react";
@@ -26,19 +26,26 @@ export function ContactInfoEditor({
     description: contact.description || "",
   });
 
+  // 使用 React Query mutation hook
+  const updateContactMutation = useUpdateContact();
+
   const handleSave = async () => {
     try {
-      const updatedContact = await ContactApi.updateContact(
-        contact.id,
-        editForm
-      );
-      if (updatedContact.data) {
-        onContactUpdate(updatedContact.data);
-        toast.success("聯絡人資料已更新");
+      const result = await updateContactMutation.mutateAsync({
+        contactId: contact.id,
+        contactData: editForm,
+      });
+
+      // 通知父組件聯絡人已更新
+      if (result.data) {
+        onContactUpdate(result.data);
       }
+
+      // 成功訊息由 mutation hook 處理
+      toast.success("聯絡人資料已更新");
     } catch (error) {
+      // 錯誤處理由 mutation hook 處理
       console.error("更新失敗:", error);
-      toast.error("更新聯絡人資料失敗");
     }
   };
 
@@ -59,6 +66,7 @@ export function ContactInfoEditor({
           value={editForm.name}
           onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
           className="mt-1"
+          disabled={updateContactMutation.isPending}
         />
       </div>
       <div>
@@ -71,14 +79,24 @@ export function ContactInfoEditor({
           }
           placeholder="添加一些關於這個聯絡人的描述..."
           className="mt-1"
+          disabled={updateContactMutation.isPending}
         />
       </div>
       <div className="flex space-x-2">
-        <Button onClick={handleSave} size="sm">
+        <Button
+          onClick={handleSave}
+          size="sm"
+          disabled={updateContactMutation.isPending}
+        >
           <Save className="h-4 w-4 mr-2" />
-          儲存
+          {updateContactMutation.isPending ? "儲存中..." : "儲存"}
         </Button>
-        <Button variant="outline" onClick={handleCancel} size="sm">
+        <Button
+          variant="outline"
+          onClick={handleCancel}
+          size="sm"
+          disabled={updateContactMutation.isPending}
+        >
           <X className="h-4 w-4 mr-2" />
           取消
         </Button>

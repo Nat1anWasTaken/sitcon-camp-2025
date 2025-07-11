@@ -3,11 +3,10 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ContactApi } from "@/lib/api/contact";
-import { RecordsApi } from "@/lib/api/records";
-import { Contact, ContactRecord } from "@/lib/types/api";
+import { useContact } from "@/lib/api/hooks/use-contact";
+import { useRecordsByContact } from "@/lib/api/hooks/use-records";
+import { Contact } from "@/lib/types/api";
 import { AlertCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 import { ContactHeader } from "./contact-header";
 import { ContactRecords } from "./contact-records";
 
@@ -17,57 +16,37 @@ interface ContactDetailsProps {
 }
 
 export function ContactDetails({ contactId, className }: ContactDetailsProps) {
-  const [contact, setContact] = useState<Contact | null>(null);
-  const [records, setRecords] = useState<ContactRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // 使用 React Query hooks
+  const {
+    data: contactResponse,
+    isLoading: isContactLoading,
+    error: contactError,
+  } = useContact(contactId);
 
-  // 載入聯絡人資料
-  const loadContact = async () => {
-    try {
-      setError(null);
-      const contactData = await ContactApi.getContact(contactId);
-      if (contactData.data) {
-        setContact(contactData.data);
-      }
-    } catch (err) {
-      console.error("載入聯絡人失敗:", err);
-      setError("載入聯絡人資料失敗");
-    }
-  };
+  const {
+    data: recordsResponse,
+    isLoading: isRecordsLoading,
+    error: recordsError,
+    refetch: refetchRecords,
+  } = useRecordsByContact(contactId);
 
-  // 載入聯絡人記錄
-  const loadRecords = async () => {
-    try {
-      const recordsData = await RecordsApi.getRecordsByContact(contactId);
-      setRecords(recordsData.data?.records || []);
-    } catch (err) {
-      console.error("載入記錄失敗:", err);
-    }
-  };
+  const contact = contactResponse?.data;
+  const records = recordsResponse?.data?.records || [];
+  const isLoading = isContactLoading || isRecordsLoading;
+  const error = contactError || recordsError;
 
-  // 初始載入資料
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([loadContact(), loadRecords()]);
-      setLoading(false);
-    };
-
-    loadData();
-  }, [contactId]);
-
-  // 處理聯絡人更新
+  // 處理聯絡人更新 - React Query 會自動處理快取更新
   const handleContactUpdate = (updatedContact: Contact) => {
-    setContact(updatedContact);
+    // React Query 的 mutation hooks 會自動更新快取
+    // 這個函數現在主要用於通知子組件
   };
 
   // 處理記錄更新
   const handleRecordsUpdate = () => {
-    loadRecords();
+    refetchRecords();
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={`space-y-6 ${className}`}>
         <Card>
@@ -100,7 +79,9 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
       <div className={`space-y-6 ${className}`}>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error || "聯絡人不存在"}</AlertDescription>
+          <AlertDescription>
+            {error?.message || "載入聯絡人資料失敗"}
+          </AlertDescription>
         </Alert>
       </div>
     );
