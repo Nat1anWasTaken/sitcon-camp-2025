@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { ChatMessage, MessageContent } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface MessageItemProps {
   message: ChatMessage;
@@ -29,11 +30,13 @@ function renderContent(content: string | MessageContent[]) {
         } else if (item.type === "image") {
           return (
             <div key={index} className="max-w-sm">
-              <img
+              <Image
                 src={`data:${item.mime_type};base64,${item.data}`}
                 alt="附件圖片"
+                width={320}
+                height={240}
                 className="rounded-lg max-w-full h-auto border border-border"
-                loading="lazy"
+                unoptimized
               />
             </div>
           );

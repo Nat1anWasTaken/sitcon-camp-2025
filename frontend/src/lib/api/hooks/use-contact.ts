@@ -176,9 +176,14 @@ export function useAvatarImage(contactId: number) {
     queryFn: () => ContactApi.getAvatarImage(contactId),
     enabled: !!contactId,
     staleTime: 1000 * 60 * 10, // 10 分鐘內不重新請求
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // 如果是 404 (沒有頭像)，不重試
-      if (error?.status === 404) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 404
+      ) {
         return false;
       }
       return failureCount < 3;

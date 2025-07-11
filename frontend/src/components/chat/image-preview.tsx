@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { formatFileSize } from "@/lib/image-utils";
 import { ImageFile } from "@/lib/types/api";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 interface ImagePreviewProps {
   images: ImageFile[];
@@ -27,17 +28,19 @@ export function ImagePreview({ images, onRemoveImage }: ImagePreviewProps) {
           {images.map((image) => (
             <Card key={image.id} className="relative group overflow-hidden">
               <div className="aspect-square relative">
-                <img
+                <Image
                   src={image.url}
                   alt={image.file.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
 
                 {/* 移除按鈕 */}
                 <Button
                   size="icon"
                   variant="destructive"
-                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                   onClick={() => onRemoveImage(image.id)}
                 >
                   <X className="h-3 w-3" />

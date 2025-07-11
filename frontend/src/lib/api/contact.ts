@@ -7,6 +7,7 @@ import {
   ContactQueryParams,
   ContactUpdate,
   SUPPORTED_AVATAR_TYPES,
+  SupportedAvatarType,
 } from "../types/api";
 import { httpClient } from "./http-client";
 
@@ -39,7 +40,9 @@ export class ContactApi {
     // 添加頭像文件
     if (avatarFile) {
       // 驗證文件類型
-      if (!SUPPORTED_AVATAR_TYPES.includes(avatarFile.type as any)) {
+      if (
+        !SUPPORTED_AVATAR_TYPES.includes(avatarFile.type as SupportedAvatarType)
+      ) {
         throw new Error(
           `不支援的文件類型: ${
             avatarFile.type
@@ -121,7 +124,9 @@ export class ContactApi {
    */
   static async uploadAvatar(contactId: number, avatarFile: File) {
     // 驗證文件類型
-    if (!SUPPORTED_AVATAR_TYPES.includes(avatarFile.type as any)) {
+    if (
+      !SUPPORTED_AVATAR_TYPES.includes(avatarFile.type as SupportedAvatarType)
+    ) {
       throw new Error(
         `不支援的文件類型: ${
           avatarFile.type
@@ -205,7 +210,7 @@ export class ContactApi {
    */
   static validateAvatarFile(file: File): { valid: boolean; error?: string } {
     // 檢查文件類型
-    if (!SUPPORTED_AVATAR_TYPES.includes(file.type as any)) {
+    if (!SUPPORTED_AVATAR_TYPES.includes(file.type as SupportedAvatarType)) {
       return {
         valid: false,
         error: `不支援的文件類型: ${
