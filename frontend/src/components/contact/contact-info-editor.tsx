@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 interface ContactInfoEditorProps {
   contact: Contact;
-  onContactUpdate: (contact: Contact) => void;
+  onContactUpdate: () => void;
   onCancel: () => void;
 }
 
@@ -43,7 +43,7 @@ export function ContactInfoEditor({
 
       // 通知父組件聯絡人已更新
       if (result.data) {
-        onContactUpdate(result.data);
+        onContactUpdate();
         toast.success("聯絡人資料已更新");
       } else {
         console.warn("更新成功但未返回數據:", result);
