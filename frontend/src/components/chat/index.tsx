@@ -1,6 +1,6 @@
 "use client";
 
-import { useStreamChat } from "@/lib/api/hooks/use-chat";
+import { useChat } from "@/lib/api/hooks/use-chat";
 import { cleanupImageUrls } from "@/lib/image-utils";
 import {
   ChatMessage,
@@ -22,13 +22,18 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ className }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [attachedImages, setAttachedImages] = useState<ImageFile[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
 
-  const { isStreaming, streamContent, sendStreamMessage, resetStream } =
-    useStreamChat();
+  const {
+    messages: sseMessages,
+    isProcessing,
+    sendMessage,
+    clearMessages,
+    connectionState,
+    streamingContent,
+  } = useChat();
 
   // 載入聊天歷史
   useEffect(() => {
@@ -36,7 +41,7 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
     if (savedHistory) {
       try {
         const parsedHistory = JSON.parse(savedHistory);
-        setMessages(parsedHistory);
+        setChatHistory(parsedHistory);
       } catch (error) {
         console.error("解析聊天歷史失敗:", error);
       }
@@ -51,6 +56,28 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
       }
     };
   }, [attachedImages]);
+
+  // 監聽 SSE 訊息變化，當聊天完成時自動添加到歷史記錄
+  useEffect(() => {
+    if (!isProcessing && sseMessages.length > 0) {
+      // 聊天完成，將助手訊息添加到歷史記錄
+      const latestMessage = sseMessages[sseMessages.length - 1];
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content: latestMessage.content,
+        timestamp: latestMessage.timestamp,
+      };
+
+      setChatHistory((prev) => {
+        const newHistory = [...prev, assistantMessage];
+        saveChatHistory(newHistory);
+        return newHistory;
+      });
+
+      // 清空 SSE 訊息（因為已經保存到歷史中）
+      clearMessages();
+    }
+  }, [isProcessing, sseMessages, clearMessages]);
 
   // 保存聊天歷史
   const saveChatHistory = (newMessages: ChatMessage[]) => {
@@ -98,7 +125,7 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
     const hasText = inputMessage.trim();
     const hasImages = attachedImages.length > 0;
 
-    if ((!hasText && !hasImages) || isStreaming) return;
+    if ((!hasText && !hasImages) || isProcessing) return;
 
     // 創建用戶訊息
     const messageContent = createMessageContent(inputMessage, attachedImages);
@@ -108,57 +135,33 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
       timestamp: new Date().toISOString(),
     };
 
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    saveChatHistory(newMessages);
+    const newChatHistory = [...chatHistory, userMessage];
+    setChatHistory(newChatHistory);
+    saveChatHistory(newChatHistory);
 
     // 清理當前輸入和圖片
     setInputMessage("");
     cleanupImageUrls(attachedImages);
     setAttachedImages([]);
-    setIsTyping(true);
-    resetStream();
 
     try {
       // 準備聊天請求
       const chatRequest = {
-        history_messages: messages,
+        history_messages: chatHistory,
         messages: [userMessage],
       };
 
-      // 發送串流請求
-      await sendStreamMessage(
-        chatRequest,
-        () => {
-          // 處理每個串流塊
-        },
-        (fullContent) => {
-          // 串流完成
-          const assistantMessage: ChatMessage = {
-            role: "assistant",
-            content: fullContent,
-            timestamp: new Date().toISOString(),
-          };
-
-          const finalMessages = [...newMessages, assistantMessage];
-          setMessages(finalMessages);
-          saveChatHistory(finalMessages);
-          setIsTyping(false);
-        },
-        (error) => {
-          console.error("聊天錯誤:", error);
-          setIsTyping(false);
-        }
-      );
+      // 發送 SSE 請求
+      await sendMessage(chatRequest);
     } catch (error) {
       console.error("發送訊息失敗:", error);
-      setIsTyping(false);
     }
   };
 
   // 清除聊天歷史
   const clearHistory = () => {
-    setMessages([]);
+    setChatHistory([]);
+    clearMessages();
     localStorage.removeItem(CHAT_HISTORY_KEY);
     // 清理附加的圖片
     if (attachedImages.length > 0) {
@@ -177,7 +180,20 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
     setInputMessage(suggestion);
   };
 
-  const hasMessages = messages.length > 0 || isStreaming;
+  // 合併聊天歷史和當前 SSE 訊息用於顯示
+  const allMessages = [
+    ...chatHistory,
+    ...sseMessages.map((sseMsg) => ({
+      role: "assistant" as const,
+      content: sseMsg.content,
+      timestamp: sseMsg.timestamp,
+    })),
+  ];
+
+  // 使用來自 hook 的串流內容
+  const currentStreamContent = isProcessing ? streamingContent : "";
+
+  const hasMessages = allMessages.length > 0 || isProcessing;
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
@@ -185,16 +201,16 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
         <WelcomeScreen onSuggestionClick={handleSuggestionClick} />
       ) : (
         <MessageList
-          messages={messages}
-          isStreaming={isStreaming}
-          streamContent={streamContent}
-          isTyping={isTyping}
+          messages={allMessages}
+          isStreaming={isProcessing}
+          streamContent={currentStreamContent}
+          isTyping={connectionState === "connecting"}
         />
       )}
 
       <ChatInput
         inputMessage={inputMessage}
-        isStreaming={isStreaming}
+        isStreaming={isProcessing}
         hasMessages={hasMessages}
         attachedImages={attachedImages}
         onInputChange={setInputMessage}

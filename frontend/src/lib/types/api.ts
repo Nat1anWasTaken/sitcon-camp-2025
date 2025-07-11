@@ -218,3 +218,101 @@ export const CONTACT_ENDPOINTS = {
   contactAvatar: (id: number) => `/contacts/${id}/avatar`,
   contactAvatarImage: (id: number) => `/contacts/${id}/avatar/image`,
 } as const;
+
+// ============== SSE 聊天事件相關型別 ==============
+
+// SSE 事件類型
+export type SSEEventType =
+  | "connected"
+  | "message"
+  | "tool_call"
+  | "done"
+  | "error";
+
+// 工具調用資訊
+export interface ToolCall {
+  name: string;
+  arguments: Record<string, unknown>;
+  result: string;
+}
+
+// SSE 事件資料基礎介面
+export interface SSEEventBase {
+  type: SSEEventType;
+  timestamp?: string;
+}
+
+// 連接事件
+export interface SSEConnectedEvent extends SSEEventBase {
+  type: "connected";
+  status: "connected";
+  message: string;
+}
+
+// 文字訊息事件
+export interface SSEMessageEvent extends SSEEventBase {
+  type: "message";
+  content: string;
+  tool_call: null;
+  timestamp: string;
+}
+
+// 工具調用事件
+export interface SSEToolCallEvent extends SSEEventBase {
+  type: "tool_call";
+  content: string;
+  tool_call: ToolCall;
+  timestamp: string;
+}
+
+// 完成事件
+export interface SSEDoneEvent extends SSEEventBase {
+  type: "done";
+  status: "completed";
+  message: string;
+}
+
+// 錯誤事件
+export interface SSEErrorEvent extends SSEEventBase {
+  type: "error";
+  status: "error";
+  message: string;
+  error_type?: string;
+}
+
+// 統一的 SSE 事件類型
+export type SSEEvent =
+  | SSEConnectedEvent
+  | SSEMessageEvent
+  | SSEToolCallEvent
+  | SSEDoneEvent
+  | SSEErrorEvent;
+
+// SSE 事件處理器介面
+export interface SSEEventHandlers {
+  onConnected?: (event: SSEConnectedEvent) => void;
+  onMessage?: (event: SSEMessageEvent) => void;
+  onToolCall?: (event: SSEToolCallEvent) => void;
+  onDone?: (event: SSEDoneEvent) => void;
+  onError?: (event: SSEErrorEvent) => void;
+}
+
+// SSE 連接配置
+export interface SSEConfig {
+  reconnect?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
+}
+
+// SSE 連接狀態
+export type SSEConnectionState =
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
+
+// 解析後的 SSE 資料
+export interface ParsedSSEData {
+  eventType: SSEEventType;
+  data: SSEEvent;
+}
