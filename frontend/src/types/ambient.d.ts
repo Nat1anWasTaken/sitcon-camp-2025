@@ -49,3 +49,16 @@ declare module "lucide-react" {
   const all: Record<string, LucideIcon>;
   export default all;
 }
+
+declare module "next-themes" {
+  import * as React from "react";
+  export interface ThemeProviderProps {
+    attribute?: string;
+    defaultTheme?: string;
+    enableSystem?: boolean;
+    disableTransitionOnChange?: boolean;
+    children?: React.ReactNode;
+  }
+  export const ThemeProvider: React.FC<ThemeProviderProps>;
+  export const useTheme: () => { theme?: string; setTheme: (theme: string) => void };
+}
