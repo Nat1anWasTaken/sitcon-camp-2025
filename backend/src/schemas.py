@@ -1,8 +1,22 @@
 import os
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, EmailStr, Field, computed_field
+
+
+class RecordCategoryEnum(str, Enum):
+    """
+    記錄分類枚舉
+    """
+
+    COMMUNICATIONS = "Communications"
+    NICKNAMES = "Nicknames"
+    MEMORIES = "Memories"
+    PREFERENCES = "Preferences"
+    PLAN = "Plan"
+    OTHER = "Other"
 
 
 class UserBase(BaseModel):
@@ -227,3 +241,64 @@ class FileUploadResponse(BaseModel):
     url: str
     size: int
     content_type: str
+
+
+# Record 相關模型
+class RecordBase(BaseModel):
+    """
+    記錄基礎模型
+    """
+
+    category: RecordCategoryEnum = Field(..., description="記錄分類")
+    content: str = Field(..., min_length=1, description="記錄內容")
+
+
+class RecordCreate(RecordBase):
+    """
+    記錄創建模型
+    """
+
+    contact_id: int = Field(..., description="所屬聯絡人 ID")
+
+
+class RecordUpdate(BaseModel):
+    """
+    記錄更新模型
+    """
+
+    category: Optional[RecordCategoryEnum] = Field(None, description="記錄分類")
+    content: Optional[str] = Field(None, min_length=1, description="記錄內容")
+
+
+class RecordResponse(RecordBase):
+    """
+    記錄響應模型
+    """
+
+    id: int
+    contact_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+class RecordListResponse(BaseModel):
+    """
+    記錄列表響應模型
+    """
+
+    records: List[RecordResponse]
+    total: int
+    page: int
+    size: int
+
+
+# 更新 ContactResponse 以包含 records
+class ContactWithRecordsResponse(ContactResponse):
+    """
+    包含記錄的聯絡人響應模型
+    """
+
+    records: List[RecordResponse] = Field(default=[], description="聯絡人的記錄列表")
