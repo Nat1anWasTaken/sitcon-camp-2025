@@ -71,13 +71,13 @@ uv run python start_dev.py
 ### 一般啟動方式
 
 ```bash
-uv run uvicorn src.main:app --reload
+uv run uvicorn main:app --reload
 ```
 
 ### 生產模式
 
 ```bash
-uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ## API 端點
@@ -145,7 +145,7 @@ backend/
    lsof -i :8000
 
    # 或使用其他端口啟動
-   uv run uvicorn src.main:app --port 8001
+   uv run uvicorn main:app --port 8001
    ```
 
 2. **資料庫錯誤**
