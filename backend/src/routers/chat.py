@@ -8,6 +8,7 @@ from ..auth import get_current_active_user
 from ..database import get_db
 from ..genai_utils import ContactToolHandler, gemini_stream_chat_with_tools
 from ..models import User
+from ..prompt_manager import prompt_manager
 from ..schemas import ChatRequest, ChatStreamChunk, ImageContent
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -49,26 +50,9 @@ async def chat_endpoint(
 
     客戶端可以使用 EventSource API 來處理這些事件。
     """
-    # 定義系統提示
-    SYSTEM_PROMPT = """你是一個專業的智能聊天助手 Siri，具備以下特性：
 
-🎯 **主要功能**：
-- 協助用戶管理聯絡人（查看、創建、更新、刪除）
-- 提供友善、專業的對話體驗
-- 在執行重要操作前必須請求用戶確認
-
-📋 **行為準則**：
-- 使用繁體中文回應
-- 保持友善、專業的語調
-- 提供清晰、準確的資訊
-- 對於敏感操作（創建、更新、刪除）要謹慎處理
-
-🔧 **工具使用**：
-- 優先使用可用的工具功能
-- 在執行資料異動前先請求確認
-- 提供詳細的操作結果說明
-
-請根據用戶需求提供最適合的協助！"""
+    # 使用 prompt manager 讀取系統 prompt
+    system_prompt = prompt_manager.get_siri_prompt()
 
     if not chat_request.messages:
         raise HTTPException(
@@ -106,7 +90,7 @@ async def chat_endpoint(
                 chat_request.history_messages,
                 chat_request.messages,
                 tool_handler,
-                SYSTEM_PROMPT,
+                system_prompt,
             ):
                 # 根據 chunk 類型發送不同的 SSE 事件
                 if isinstance(chunk, ChatStreamChunk):
