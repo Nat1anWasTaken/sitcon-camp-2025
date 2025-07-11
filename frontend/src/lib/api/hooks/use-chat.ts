@@ -16,6 +16,7 @@ import {
 } from "../../types/api";
 import { ChatApi, SSEConnection } from "../chat";
 import { contactQueryKeys } from "./use-contact";
+import { recordQueryKeys } from "./use-records";
 
 /**
  * 新的 SSE 聊天 hook
@@ -84,6 +85,10 @@ export const useChat = () => {
             // 使聯絡人快取失效並重新獲取
             console.log("工具調用detected，正在使聯絡人快取失效...");
             queryClient.invalidateQueries({ queryKey: contactQueryKeys.all });
+
+            // 使記錄快取失效並重新獲取
+            console.log("工具調用detected，正在使記錄快取失效...");
+            queryClient.invalidateQueries({ queryKey: recordQueryKeys.all });
 
             customHandlers?.onToolCall?.(event);
           },

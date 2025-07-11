@@ -322,3 +322,62 @@ export interface ParsedSSEData {
   eventType: SSEEventType;
   data: SSEEvent;
 }
+
+// ============== 記錄相關型別 ==============
+
+// 記錄分類枚舉
+export type RecordCategory =
+  | "Communications"
+  | "Nicknames"
+  | "Memories"
+  | "Preferences"
+  | "Plan"
+  | "Other";
+
+// 記錄資料型別
+export interface ContactRecord {
+  id: number;
+  category: RecordCategory;
+  content: string;
+  contact_id: number;
+  created_at: string;
+  updated_at: string | null;
+}
+
+// 創建記錄請求
+export interface RecordCreate {
+  category: RecordCategory;
+  content: string;
+  contact_id: number;
+}
+
+// 更新記錄請求
+export interface RecordUpdate {
+  category?: RecordCategory;
+  content?: string;
+}
+
+// 記錄列表響應
+export interface RecordListResponse {
+  records: ContactRecord[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+// 記錄查詢參數
+export interface RecordQueryParams {
+  skip?: number;
+  limit?: number;
+  contact_id?: number;
+  category?: RecordCategory;
+  search?: string;
+}
+
+// 記錄 API 端點常數
+export const RECORD_ENDPOINTS = {
+  records: "/records/",
+  recordById: (id: number) => `/records/${id}`,
+  recordsByContact: (contactId: number) => `/records/by-contact/${contactId}`,
+  categories: "/records/categories/",
+} as const;
