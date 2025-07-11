@@ -287,3 +287,50 @@ class ContactWithRecordsResponse(ContactResponse):
     """
 
     records: List[RecordResponse] = Field(default=[], description="聯絡人的記錄列表")
+
+
+# User Profile Management Schemas
+class PasswordChangeRequest(BaseModel):
+    """
+    用戶密碼變更請求模型
+    """
+    
+    current_password: str = Field(..., description="當前密碼")
+    new_password: str = Field(..., min_length=8, max_length=100, description="新密碼")
+
+
+class UserPreferencesUpdate(BaseModel):
+    """
+    用戶偏好設定更新模型
+    """
+    
+    full_name: Optional[str] = Field(None, max_length=100, description="完整姓名")
+    email: Optional[EmailStr] = Field(None, description="電子郵件")
+
+
+class AccountDeletionRequest(BaseModel):
+    """
+    帳號刪除請求模型
+    """
+    
+    password: str = Field(..., description="確認密碼")
+    confirmation: str = Field(..., description="確認字串，必須為 'DELETE_MY_ACCOUNT'")
+
+
+class ProfileResponse(BaseModel):
+    """
+    用戶個人資料響應模型
+    """
+    
+    id: int
+    email: str
+    username: str
+    full_name: Optional[str]
+    is_active: bool
+    created_at: datetime
+    updated_at: Optional[datetime]
+    contacts_count: int = Field(0, description="聯絡人數量")
+    records_count: int = Field(0, description="記錄數量")
+
+    class Config:
+        from_attributes = True
