@@ -125,6 +125,30 @@ class ChatResponse(BaseModel):
     status: str = Field(default="success", description="響應狀態")
 
 
+class ToolCall(BaseModel):
+    """
+    工具調用模型
+    """
+
+    name: str = Field(..., description="工具名稱")
+    arguments: dict = Field(..., description="工具參數")
+    result: str = Field(..., description="工具執行結果")
+
+
+class ChatStreamChunk(BaseModel):
+    """
+    聊天串流片段模型 - 支援文字和工具調用
+    """
+
+    type: str = Field(..., description="片段類型: 'text' 或 'tool_call'")
+    content: Optional[str] = Field(None, description="文字內容")
+    tool_call: Optional[ToolCall] = Field(None, description="工具調用資訊")
+    timestamp: datetime = Field(default_factory=datetime.now, description="時間戳")
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+
 # Contact 相關模型
 class ContactBase(BaseModel):
     """
