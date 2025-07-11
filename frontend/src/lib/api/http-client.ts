@@ -99,17 +99,42 @@ export class HttpClient {
 
     try {
       const response = await fetch(url, requestOptions);
-      const isJson = response.headers
-        .get("content-type")
-        ?.includes("application/json");
-      const data = isJson ? await response.json() : await response.text();
+
+      // 檢查回應是否有內容
+      const hasContent =
+        response.headers.get("content-length") !== "0" &&
+        response.status !== 204;
+
+      let data: T | string | null = null;
+
+      if (hasContent) {
+        const isJson = response.headers
+          .get("content-type")
+          ?.includes("application/json");
+
+        // 只有在有內容時才嘗試解析
+        try {
+          data = isJson ? await response.json() : await response.text();
+        } catch (parseError) {
+          // 如果解析失敗，嘗試取得文字內容
+          const text = await response.text();
+          data = text || null;
+        }
+      }
 
       if (!response.ok) {
-        throw new ApiError(
-          data?.detail || data?.message || `HTTP ${response.status}`,
-          response.status,
-          data
-        );
+        let errorMessage = `HTTP ${response.status}`;
+
+        // 嘗試從回應資料中取得錯誤訊息
+        if (data && typeof data === "object") {
+          const errorData = data as any;
+          errorMessage =
+            errorData?.detail || errorData?.message || errorMessage;
+        } else if (typeof data === "string" && data) {
+          errorMessage = data;
+        }
+
+        throw new ApiError(errorMessage, response.status, data);
       }
 
       return {

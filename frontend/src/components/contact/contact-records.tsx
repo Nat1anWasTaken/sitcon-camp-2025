@@ -155,7 +155,14 @@ export function ContactRecords({
               )}
             </div>
             <div className="flex space-x-1 ml-4">
-              <Dialog>
+              <Dialog
+                open={editingRecord?.id === record.id}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setEditingRecord(null);
+                  }
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="ghost"
