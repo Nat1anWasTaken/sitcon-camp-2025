@@ -61,13 +61,7 @@ export class ContactApi {
 
     return httpClient.post<Contact>(
       CONTACT_ENDPOINTS.contactsWithAvatar,
-      formData,
-      {
-        headers: {
-          // 移除 Content-Type，讓瀏覽器自動設置 multipart/form-data
-          "Content-Type": "",
-        },
-      }
+      formData
     );
   }
 
@@ -144,12 +138,7 @@ export class ContactApi {
     formData.append("file", avatarFile);
 
     const endpoint = CONTACT_ENDPOINTS.contactAvatar(contactId);
-    return httpClient.post<AvatarUploadResponse>(endpoint, formData, {
-      headers: {
-        // 移除 Content-Type，讓瀏覽器自動設置 multipart/form-data
-        "Content-Type": "",
-      },
-    });
+    return httpClient.post<AvatarUploadResponse>(endpoint, formData);
   }
 
   /**
@@ -161,47 +150,35 @@ export class ContactApi {
   }
 
   /**
-   * 獲取頭像圖片 URL
+   * 獲取頭像圖片 (返回 blob URL)
    */
-  static getAvatarImageUrl(contactId: number): string {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    return `${baseURL}${CONTACT_ENDPOINTS.contactAvatarImage(contactId)}`;
+  static async getAvatarImage(contactId: number): Promise<string | null> {
+    try {
+      const endpoint = CONTACT_ENDPOINTS.contactAvatarImage(contactId);
+      const blob = await httpClient.getBlob(endpoint);
+
+      if (!blob) {
+        return null;
+      }
+
+      // 創建 blob URL 用於顯示圖片
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("獲取頭像失敗:", error);
+      return null;
+    }
   }
 
   /**
-   * 獲取頭像圖片 (需要認證的二進制數據)
+   * 獲取頭像圖片 Blob 數據
    */
-  static async getAvatarImage(contactId: number): Promise<Blob | null> {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
-
-    if (!token) {
-      throw new Error("需要認證才能獲取頭像");
-    }
-
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    const url = `${baseURL}${CONTACT_ENDPOINTS.contactAvatarImage(contactId)}`;
-
+  static async getAvatarBlob(contactId: number): Promise<Blob | null> {
     try {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null; // 沒有頭像
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return await response.blob();
+      const endpoint = CONTACT_ENDPOINTS.contactAvatarImage(contactId);
+      return await httpClient.getBlob(endpoint);
     } catch (error) {
-      console.error("獲取頭像失敗:", error);
-      throw error;
+      console.error("獲取頭像 Blob 失敗:", error);
+      return null;
     }
   }
 
