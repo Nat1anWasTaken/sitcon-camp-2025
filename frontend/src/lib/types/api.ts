@@ -11,6 +11,7 @@ export interface UserResponse {
   full_name?: string | null;
   id: number;
   is_active: boolean;
+  preferences?: Record<string, unknown>;
   created_at: string;
   updated_at?: string | null;
 }

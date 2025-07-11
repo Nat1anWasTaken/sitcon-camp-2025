@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth, useLogout } from "@/lib/api/hooks";
+import { useCurrentUser } from "@/lib/api/hooks/use-user";
 import { cn } from "@/lib/utils";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -22,6 +23,8 @@ interface NavbarProps {
 export function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
+  const { data: userRes } = useCurrentUser();
+  const user = userRes?.data;
   const logout = useLogout();
 
   // 判斷是否在認證相關頁面（登入、註冊等）
@@ -66,11 +69,16 @@ export function Navbar({ className }: NavbarProps) {
                   <button className="relative h-8 w-8 rounded-full ring-2 ring-transparent transition-all hover:ring-2 hover:ring-primary/20">
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src="/placeholder-avatar.jpg"
+                        src={
+                          (user?.preferences?.avatar_url as string) ||
+                          "/placeholder-avatar.jpg"
+                        }
                         alt="用戶頭像"
                       />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        <User className="h-4 w-4" />
+                        {user?.username?.charAt(0).toUpperCase() || (
+                          <User className="h-4 w-4" />
+                        )}
                       </AvatarFallback>
                     </Avatar>
                   </button>
@@ -82,12 +90,7 @@ export function Navbar({ className }: NavbarProps) {
                       <span>個人資料</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center w-full">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>設定</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  {/* Settings link removed until implemented */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600 focus:text-red-600"

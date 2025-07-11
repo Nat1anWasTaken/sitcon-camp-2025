@@ -15,6 +15,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/lib/api/hooks/use-auth";
+import { z } from "zod";
+import type { FormEvent } from "react";
 
 export default function ProfilePage() {
   const [oldPassword, setOldPassword] = useState("");
@@ -29,7 +31,7 @@ export default function ProfilePage() {
   const logout = useLogout();
   const router = useRouter();
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       toast.error("新密碼與確認密碼不一致");
@@ -38,16 +40,29 @@ export default function ProfilePage() {
     changePassword.mutate({ old_password: oldPassword, new_password: newPassword });
   };
 
-  const handlePreferencesSubmit = (e: React.FormEvent) => {
+  const handlePreferencesSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let parsed: Record<string, unknown>;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(preferences);
-    } catch (err) {
+    } catch {
       toast.error("偏好設定必須是有效的 JSON 格式");
       return;
     }
-    updatePreferences.mutate({ preferences: parsed });
+
+    const schema = z
+      .record(z.any())
+      .refine((val: unknown) => !Array.isArray(val), {
+        message: "偏好設定必須是物件",
+      });
+
+    const result = schema.safeParse(parsed);
+    if (!result.success) {
+      toast.error(result.error.errors[0]?.message || "偏好設定格式錯誤");
+      return;
+    }
+
+    updatePreferences.mutate({ preferences: result.data });
   };
 
   const handleDeleteAccount = () => {
@@ -55,10 +70,13 @@ export default function ProfilePage() {
     deleteAccount.mutate(undefined, {
       onSuccess: () => {
         toast.success("帳號已刪除");
-        logout.mutate();
-        router.replace("/register");
+        logout.mutate(undefined, {
+          onSettled: () => {
+            router.replace("/register");
+          },
+        });
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         toast.error(error.message || "刪除帳號失敗");
       },
     });
