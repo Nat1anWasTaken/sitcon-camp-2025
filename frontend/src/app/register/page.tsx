@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/lib/api/hooks/use-auth";
 import { useRegister } from "@/lib/api/hooks/use-auth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -26,7 +28,16 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
 
+  const { isAuthenticated, isLoading } = useAuth();
   const registerMutation = useRegister();
+  const router = useRouter();
+
+  // 如果已經登入，重定向到首頁
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -61,6 +72,20 @@ export default function RegisterPage() {
       password: formData.password,
     });
   };
+
+  // 如果正在載入或已經登入，顯示載入狀態
+  if (isLoading || isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">
+            {isAuthenticated ? "正在跳轉..." : "正在載入..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
