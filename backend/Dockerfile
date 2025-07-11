@@ -1,4 +1,4 @@
-FROM python:3.12-slim as builder
+FROM python:3.13-slim as builder
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock* ./
 
 RUN uv sync --frozen --no-cache
 
-FROM python:3.12-slim as production
+FROM python:3.13-slim as production
 
 RUN apt-get update && apt-get install -y \
     curl \
