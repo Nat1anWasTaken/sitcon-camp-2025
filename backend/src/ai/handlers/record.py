@@ -296,7 +296,7 @@ class RecordToolHandler:
 
         result = "可用的記錄分類：\n"
         category_descriptions = {
-            "Communications": "📞 通訊記錄 - 電話、訊息、郵件等聯絡記錄",
+            "Communications": "📞 聯絡方式 - 社交媒體帳號、通訊軟體ID、連結等聯絡資訊",
             "Nicknames": "🏷️ 暱稱 - 對聯絡人的稱呼或代號",
             "Memories": "💭 回憶 - 共同回憶、重要事件記錄",
             "Preferences": "❤️ 偏好 - 喜好、興趣、習慣等",

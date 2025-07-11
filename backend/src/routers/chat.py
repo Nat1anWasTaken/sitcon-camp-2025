@@ -38,7 +38,7 @@ async def chat_endpoint(
     - 按分類和內容搜索記錄
 
     支援的記錄分類：
-    - Communications: 通訊記錄
+    - Communications: 聯絡方式
     - Nicknames: 暱稱
     - Memories: 回憶
     - Preferences: 偏好
