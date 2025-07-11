@@ -41,6 +41,7 @@ interface ButtonProps
   extends Omit<React.ComponentProps<"button">, keyof MotionProps>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  children?: React.ReactNode;
 }
 
 function Button({

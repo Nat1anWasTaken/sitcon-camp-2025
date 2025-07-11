@@ -50,7 +50,7 @@ export default function LoginPage() {
   // 如果正在載入或已經登入，顯示載入狀態
   if (isLoading || isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen min-w-md flex items-center justify-center">
         <MotionWrapper
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -75,13 +75,14 @@ export default function LoginPage() {
   }
 
   return (
-    <PageTransition className="min-h-screen flex items-center justify-center bg-background p-4">
+    <PageTransition className="min-h-screen flex min-w-md items-center justify-center bg-background p-4">
       <motion.div
         initial={{ opacity: 0, y: 50, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="w-full max-w-md"
       >
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-lg">
           <CardHeader className="space-y-1">
             <motion.div
               className="flex items-center justify-center mb-4"
