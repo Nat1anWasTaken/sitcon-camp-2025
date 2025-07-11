@@ -380,3 +380,16 @@ export const RECORD_ENDPOINTS = {
   recordsByContact: (contactId: number) => `/records/by-contact/${contactId}`,
   categories: "/records/categories/",
 } as const;
+
+export interface PasswordUpdateRequest {
+  old_password: string;
+  new_password: string;
+}
+
+export interface PreferencesUpdateRequest {
+  preferences: Record<string, unknown>;
+}
+
+export interface MessageResponse {
+  message: string;
+}

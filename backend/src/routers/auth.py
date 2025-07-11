@@ -12,10 +12,18 @@ from ..auth import (
     get_password_hash,
     get_user_by_email,
     get_user_by_username,
+    verify_password,
 )
 from ..database import get_db
 from ..models import User
-from ..schemas import Token, UserCreate, UserResponse
+from ..schemas import (
+    Token,
+    UserCreate,
+    UserResponse,
+    PasswordUpdate,
+    PreferencesUpdate,
+    MessageResponse,
+)
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -91,3 +99,55 @@ async def get_current_user_info(current_user: User = Depends(get_current_active_
     獲取當前用戶資訊端點
     """
     return current_user
+
+
+# -------------------------- 個人設定相關端點 --------------------------
+
+
+@router.patch("/change-password", response_model=MessageResponse)
+async def change_password(
+    payload: PasswordUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """修改使用者密碼"""
+
+    # 驗證舊密碼
+    if not verify_password(payload.old_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="舊密碼不正確"
+        )
+
+    # 更新密碼
+    current_user.hashed_password = get_password_hash(payload.new_password)
+    db.commit()
+
+    return {"message": "密碼已成功更新"}
+
+
+@router.patch("/@me", response_model=UserResponse)
+async def update_preferences(
+    payload: PreferencesUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """更新使用者偏好設定"""
+
+    current_user.preferences = payload.preferences
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
+
+
+@router.delete("/@me", response_model=MessageResponse, status_code=status.HTTP_200_OK)
+async def delete_account(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """刪除目前登入的帳號"""
+
+    db.delete(current_user)
+    db.commit()
+
+    return {"message": "帳號已刪除"}

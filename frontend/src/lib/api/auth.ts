@@ -103,6 +103,21 @@ export class AuthApi {
   static hasToken(): boolean {
     return !!this.getStoredToken();
   }
+
+  static async changePassword(passwordData: import("../types/api").PasswordUpdateRequest) {
+    return httpClient.patch<import("../types/api").MessageResponse>(
+      "/auth/change-password",
+      passwordData
+    );
+  }
+
+  static async updatePreferences(preferencesData: import("../types/api").PreferencesUpdateRequest) {
+    return httpClient.patch<UserResponse>("/auth/@me", preferencesData);
+  }
+
+  static async deleteAccount() {
+    return httpClient.delete<import("../types/api").MessageResponse>("/auth/@me");
+  }
 }
 
 // 自動初始化認證狀態

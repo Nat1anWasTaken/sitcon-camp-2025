@@ -27,6 +27,9 @@ class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
     full_name: Optional[str] = Field(None, max_length=100)
+    preferences: Optional[dict] = Field(
+        default_factory=dict, description="用戶偏好設定 (JSON)"
+    )
 
 
 class UserCreate(UserBase):
@@ -58,6 +61,28 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+
+# ============== 用戶資料更新相關模型 ==============
+
+
+class PasswordUpdate(BaseModel):
+    """用戶修改密碼模型"""
+
+    old_password: str = Field(..., min_length=8, max_length=100)
+    new_password: str = Field(..., min_length=8, max_length=100)
+
+
+class PreferencesUpdate(BaseModel):
+    """用戶偏好設定更新模型"""
+
+    preferences: dict = Field(..., description="新的偏好設定 (JSON)")
+
+
+class MessageResponse(BaseModel):
+    """通用訊息響應模型"""
+
+    message: str
 
 
 class Token(BaseModel):
