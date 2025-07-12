@@ -7,6 +7,7 @@ import { ChatMessage, MessageContent } from "@/lib/types/api";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Markdown from "react-markdown";
 import { ToolCallDisplay } from "./tool-call-display";
 
 interface MessageItemProps {
@@ -18,7 +19,7 @@ interface MessageItemProps {
 function renderContent(content: string | MessageContent[]) {
   // 向後兼容：處理純文字內容
   if (typeof content === "string") {
-    return <p className="text-sm whitespace-pre-wrap">{content}</p>;
+    return <Markdown>{content}</Markdown>;
   }
 
   // 處理複合內容
@@ -28,7 +29,7 @@ function renderContent(content: string | MessageContent[]) {
         if (item.type === "text") {
           return (
             <p key={index} className="text-sm whitespace-pre-wrap">
-              {item.text}
+              <Markdown>{item.text}</Markdown>
             </p>
           );
         } else if (item.type === "image") {
