@@ -1,5 +1,4 @@
 import json
-from re import search
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
