@@ -67,7 +67,7 @@ class ContactTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="create_contact",
-                    description="創建新聯絡人（需要用戶確認）",
+                    description="創建新聯絡人",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={
@@ -90,7 +90,7 @@ class ContactTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="update_contact",
-                    description="更新聯絡人（需要用戶確認）",
+                    description="更新聯絡人",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={
@@ -116,7 +116,7 @@ class ContactTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="delete_contact",
-                    description="刪除聯絡人（需要用戶確認）",
+                    description="刪除聯絡人",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={
