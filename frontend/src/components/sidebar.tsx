@@ -19,6 +19,7 @@ interface SidebarProps {
   onContactClick?: (contact: Contact) => void;
   onSiriClick?: () => void;
   className?: string;
+  onContactDeleted?: () => void; // 新增 prop
 }
 
 export function Sidebar({
@@ -27,14 +28,15 @@ export function Sidebar({
   onContactClick,
   onSiriClick,
   className,
+  onContactDeleted, // 新增 prop
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 使用API級別的搜尋功能
   const {
     data: contactsResponse,
     isLoading,
     error,
+    refetch, // React Query refetch
   } = useContactSearch(searchQuery);
 
   // 直接使用API返回的Contact資料
@@ -131,6 +133,12 @@ export function Sidebar({
         </AnimatePresence>
       </MotionList>
     );
+  };
+
+  // 提供刪除聯絡人後的 callback
+  const handleContactDeleted = () => {
+    refetch(); // 重新取得聯絡人列表
+    if (onContactDeleted) onContactDeleted(); // 若父層有傳入 callback 也執行
   };
 
   return (

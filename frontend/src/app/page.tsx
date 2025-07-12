@@ -53,9 +53,10 @@ export default function Home() {
           isSiriActive={isSiriActive}
           onContactClick={handleContactClick}
           onSiriClick={handleSiriClick}
+          onContactDeleted={() => setActiveContactId(undefined)} // 刪除後清空選取
         />
       </motion.div>
-
+      
       {/* 主要內容區域 - 在桌面版始終顯示，在移動版當 showContent=true 時顯示 */}
       <motion.div
         className={`

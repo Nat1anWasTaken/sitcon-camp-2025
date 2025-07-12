@@ -72,6 +72,9 @@ class Contact(Base):
     )
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    phone = Column(String(50), nullable=True)
+    job = Column(String(100), nullable=True)
+    gender = Column(String(20), nullable=True)
 
     # 關聯關係
     user = relationship("User", back_populates="contacts")

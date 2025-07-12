@@ -8,13 +8,17 @@ import { useRecordsByContact } from "@/lib/api/hooks/use-records";
 import { AlertCircle } from "lucide-react";
 import { ContactHeader } from "./contact-header";
 import { ContactRecords } from "./contact-records";
+import { toast } from "sonner";
+import { useState } from "react";
+import { ContactInfoEditor } from "./contact-info-editor";
 
 interface ContactDetailsProps {
   contactId: number;
   className?: string;
+  onContactDeleted?: () => void;
 }
 
-export function ContactDetails({ contactId, className }: ContactDetailsProps) {
+export function ContactDetails({ contactId, className, onContactDeleted }: ContactDetailsProps) {
   // 使用 React Query hooks
   const {
     data: contactResponse,
@@ -33,6 +37,8 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
   const records = recordsResponse?.data?.records || [];
   const isLoading = isContactLoading || isRecordsLoading;
   const error = contactError || recordsError;
+
+  const [isEditing, setIsEditing] = useState(false);
 
   // 處理記錄更新
   const handleRecordsUpdate = () => {
@@ -85,8 +91,7 @@ export function ContactDetails({ contactId, className }: ContactDetailsProps) {
   return (
     <div className={`space-y-4 md:space-y-6 max-w-full ${className}`}>
       {/* 聯絡人基本資料 */}
-      <ContactHeader contact={contact} />
-
+      <ContactHeader contact={contact} onContactDeleted={onContactDeleted} />
       {/* 聯絡人記錄 */}
       <ContactRecords
         contactId={contactId}
