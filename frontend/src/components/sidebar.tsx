@@ -19,7 +19,6 @@ interface SidebarProps {
   onContactClick?: (contact: Contact) => void;
   onSiriClick?: () => void;
   className?: string;
-  onContactDeleted?: () => void; // 新增 prop
 }
 
 export function Sidebar({
@@ -28,7 +27,6 @@ export function Sidebar({
   onContactClick,
   onSiriClick,
   className,
-  onContactDeleted, // 新增 prop
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -36,7 +34,6 @@ export function Sidebar({
     data: contactsResponse,
     isLoading,
     error,
-    refetch, // React Query refetch
   } = useContactSearch(searchQuery);
 
   // 直接使用API返回的Contact資料
