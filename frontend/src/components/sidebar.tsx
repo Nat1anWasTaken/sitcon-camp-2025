@@ -119,7 +119,7 @@ export function Sidebar({
     return (
       <MotionList className="space-y-1" stagger="fast">
         <AnimatePresence mode="popLayout">
-          {contacts.map((contact, index) => (
+          {contacts.map((contact) => (
             <motion.div key={contact.id} variants={listItemVariants} layout>
               <ContactComponent
                 contact={contact}

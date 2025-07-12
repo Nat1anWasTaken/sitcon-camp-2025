@@ -274,18 +274,6 @@ export const bounceVariants: Variants = {
   },
 };
 
-// Utility function to create custom variants
-export const createCustomVariants = (
-  initial: any,
-  animate: any,
-  exit?: any,
-  transition = easings.smooth
-): Variants => ({
-  initial,
-  animate: { ...animate, transition },
-  exit: exit ? { ...exit, transition } : undefined,
-});
-
 // Animation presets for common patterns
 export const animationPresets = {
   // For buttons and clickable elements
