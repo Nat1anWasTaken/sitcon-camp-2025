@@ -34,6 +34,7 @@ export default function Home() {
           isSiriActive={isSiriActive}
           onContactClick={handleContactClick}
           onSiriClick={handleSiriClick}
+          onContactDeleted={() => setActiveContactId(undefined)} // 刪除後清空選取
         />
       </div>
 
@@ -45,7 +46,10 @@ export default function Home() {
         ) : activeContactId ? (
           // 聯絡人詳情介面
           <div className="flex-1 p-6 overflow-auto">
-            <ContactDetails contactId={activeContactId} />
+            <ContactDetails
+              contactId={activeContactId}
+              onContactDeleted={() => setActiveContactId(undefined)}
+            />
           </div>
         ) : (
           // 歡迎頁面
