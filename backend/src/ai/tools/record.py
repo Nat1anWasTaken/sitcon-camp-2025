@@ -103,7 +103,7 @@ class RecordTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="create_record",
-                    description="為聯絡人創建新記錄（需要用戶確認）",
+                    description="為聯絡人創建新記錄",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={
@@ -130,7 +130,7 @@ class RecordTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="update_record",
-                    description="更新記錄（需要用戶確認）",
+                    description="更新記錄",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={
@@ -157,7 +157,7 @@ class RecordTools:
             function_declarations=[
                 types.FunctionDeclaration(
                     name="delete_record",
-                    description="刪除記錄（需要用戶確認）",
+                    description="刪除記錄",
                     parameters=types.Schema(
                         type=types.Type.OBJECT,
                         properties={

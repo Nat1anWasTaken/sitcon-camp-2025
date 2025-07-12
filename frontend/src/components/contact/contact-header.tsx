@@ -25,14 +25,16 @@ export function ContactHeader({ contact, onContactDeleted }: ContactHeaderProps 
   };
 
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-start space-x-6">
+    <Card className="w-full">
+      <CardContent className="p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-6">
           {/* 頭像區域 */}
-          <ContactAvatar contact={contact} />
+          <div className="flex justify-center sm:justify-start">
+            <ContactAvatar contact={contact} size="md" />
+          </div>
 
           {/* 基本資料區域 */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0 max-w-full">
             {isEditing ? (
               <ContactInfoEditor
                 contact={contact}

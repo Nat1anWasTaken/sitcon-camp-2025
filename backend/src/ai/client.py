@@ -10,7 +10,7 @@ from google.genai import types
 from ..schemas import ChatMessage, ImageContent, TextContent
 
 _client = None
-MODEL_ID = "gemini-2.0-flash"
+MODEL_ID = "gemini-2.5-flash"
 
 
 def get_gemini_client() -> genai.Client:

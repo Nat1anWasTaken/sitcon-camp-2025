@@ -136,87 +136,102 @@ export function ContactRecords({
     const Icon = categoryInfo.icon;
 
     return (
-      <Card key={record.id} className="mb-3">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center space-x-2 mb-2">
-                <Icon className="h-4 w-4" />
-                <Badge variant="secondary" className={categoryInfo.color}>
+      <Card key={record.id} className="mb-3 w-full">
+        <CardContent className="p-3 sm:p-4">
+          <div className="space-y-3">
+            {/* Header with category and date */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div className="flex items-center space-x-2 min-w-0">
+                <Icon className="h-4 w-4 shrink-0" />
+                <Badge
+                  variant="secondary"
+                  className={`${categoryInfo.color} text-xs shrink-0`}
+                >
                   {categoryInfo.label}
                 </Badge>
-                <span className="text-sm text-muted-foreground">
-                  {formatDate(record.created_at)}
-                </span>
               </div>
-              <p className="text-foreground whitespace-pre-wrap">
-                {record.content}
-              </p>
-              {record.updated_at && record.updated_at !== record.created_at && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  最後編輯: {formatDate(record.updated_at)}
-                </p>
-              )}
+              <span className="text-xs sm:text-sm text-muted-foreground shrink-0">
+                {formatDate(record.created_at)}
+              </span>
             </div>
-            <div className="flex space-x-1 ml-4">
-              <Dialog
-                open={editingRecord?.id === record.id}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setEditingRecord(null);
-                  }
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditingRecord(record)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>編輯記錄</DialogTitle>
-                  </DialogHeader>
-                  <ContactRecordForm
-                    contactId={contactId}
-                    record={record}
-                    onSave={handleRecordSave}
-                    onCancel={() => setEditingRecord(null)}
-                  />
-                </DialogContent>
-              </Dialog>
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={deleteRecordMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>確認刪除</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      您確定要刪除這筆記錄嗎？此操作無法復原。
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>取消</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDeleteRecord(record.id)}
+            {/* Content */}
+            <p className="text-foreground whitespace-pre-wrap break-words text-sm sm:text-base overflow-hidden">
+              {record.content}
+            </p>
+
+            {/* Footer with last edited and actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div className="flex-1 min-w-0">
+                {record.updated_at &&
+                  record.updated_at !== record.created_at && (
+                    <p className="text-xs text-muted-foreground truncate">
+                      最後編輯: {formatDate(record.updated_at)}
+                    </p>
+                  )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex space-x-1 self-end sm:self-auto shrink-0">
+                <Dialog
+                  open={editingRecord?.id === record.id}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setEditingRecord(null);
+                    }
+                  }}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingRecord(record)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:w-full sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>編輯記錄</DialogTitle>
+                    </DialogHeader>
+                    <ContactRecordForm
+                      contactId={contactId}
+                      record={record}
+                      onSave={handleRecordSave}
+                      onCancel={() => setEditingRecord(null)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       disabled={deleteRecordMutation.isPending}
                     >
-                      {deleteRecordMutation.isPending ? "刪除中..." : "刪除"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:w-auto sm:max-w-lg">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>確認刪除</AlertDialogTitle>
+                      <AlertDialogDescription className="break-words">
+                        您確定要刪除這筆記錄嗎？此操作無法復原。
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="flex-col sm:flex-row space-y-2 sm:space-y-0">
+                      <AlertDialogCancel>取消</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteRecord(record.id)}
+                        disabled={deleteRecordMutation.isPending}
+                      >
+                        {deleteRecordMutation.isPending ? "刪除中..." : "刪除"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -225,18 +240,18 @@ export function ContactRecords({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>聯絡人記錄</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="pb-4">
+        <div className="flex flex-row justify-between items-between space-y-3 sm:space-y-0">
+          <CardTitle className="text-lg sm:text-xl">聯絡人記錄</CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="sm" className="self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 新增記錄
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:w-full sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>新增記錄</DialogTitle>
               </DialogHeader>
@@ -249,16 +264,27 @@ export function ContactRecords({
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 sm:px-6">
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="all">全部 ({records.length})</TabsTrigger>
-            {Object.entries(CATEGORY_INFO).map(([category, info]) => (
-              <TabsTrigger key={category} value={category}>
-                {info.label} ({getCategoryCount(category as RecordCategory)})
+          <div className="overflow-x-auto -mx-2 px-2">
+            <TabsList className="grid grid-cols-7 w-max min-w-full">
+              <TabsTrigger
+                value="all"
+                className="text-xs sm:text-sm whitespace-nowrap px-2"
+              >
+                全部 ({records.length})
               </TabsTrigger>
-            ))}
-          </TabsList>
+              {Object.entries(CATEGORY_INFO).map(([category, info]) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="text-xs sm:text-sm whitespace-nowrap px-2"
+                >
+                  {info.label} ({getCategoryCount(category as RecordCategory)})
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           <TabsContent value="all" className="mt-4">
             {records.length === 0 ? (

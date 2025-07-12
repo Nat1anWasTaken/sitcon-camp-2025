@@ -71,7 +71,7 @@ async def chat_endpoint(
         "%user_contacts%",
         "\n".join(
             [
-                f"{contact.name} (Also known as {', '.join([record.content for record in contact.records if record.category == RecordCategory.NICKNAMES])}) - {contact.description}"
+                f"[ID: `{contact.id}`]{contact.name} (Also known as {', '.join([record.content for record in contact.records if record.category == RecordCategory.NICKNAMES])}) - {contact.description}"
                 for contact in contacts
             ]
         )

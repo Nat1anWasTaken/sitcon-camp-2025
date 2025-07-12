@@ -25,6 +25,7 @@ async def gemini_stream_chat(
             temperature=0.7,
             candidate_count=1,
             max_output_tokens=2048,
+            thinking_config=types.ThinkingConfig(include_thoughts=True),
         )
 
     try:
