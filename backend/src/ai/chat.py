@@ -51,13 +51,6 @@ async def gemini_stream_chat_with_tools(
     """帶工具功能的 Gemini 聊天"""
     from .handlers.unified import UnifiedToolHandler
 
-    # 強化 system prompt
-    force_tool_prompt = "遇到用戶要求新增聯絡人時，請務必呼叫 create_contact 工具，不要僅回覆文字。"
-    if system_prompt:
-        system_prompt = force_tool_prompt + "\n" + system_prompt
-    else:
-        system_prompt = force_tool_prompt
-
     contents = build_message_contents(history, messages, system_prompt)
     tools = UnifiedToolHandler.create_all_tools()
 
@@ -73,7 +66,7 @@ async def gemini_stream_chat_with_tools(
         response = await get_gemini_client().aio.models.generate_content(
             model=MODEL_ID, contents=contents, config=config
         )
-        print("[DEBUG] Gemini response:", response)
+
         async for chunk in _process_tool_response(response, tool_handler, contents):
             yield chunk
 
@@ -102,15 +95,12 @@ async def _process_tool_response(
 
     # 處理每個部分
     for part in candidate.content.parts:
-        print("[DEBUG] candidate part:", part)
         if hasattr(part, "function_call") and part.function_call:
             has_function_calls = True
-            print("[DEBUG] function_call detected:", part.function_call)
             tool_result, tool_info = await tool_handler.handle_tool_call(
                 part.function_call
             )
-            print("[DEBUG] tool_result:", tool_result)
-            print("[DEBUG] tool_info:", tool_info)
+
             yield ChatStreamChunk(
                 type="tool_call",
                 content=tool_result,
