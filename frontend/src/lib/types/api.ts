@@ -127,7 +127,7 @@ export interface ToolCall {
 // 統一的聊天訊息類型
 export interface ChatMessage {
   id?: string; // 內部使用的唯一識別符（可選，用於 SSE 訊息）
-  role: string; // user, assistant, system
+  role: string; // user, model, system
   content: string | MessageContent[]; // 支援純文字或複合內容
   timestamp?: string | null;
   type?: "message" | "tool_call";

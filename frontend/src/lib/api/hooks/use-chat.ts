@@ -74,7 +74,7 @@ export const useChat = () => {
           onToolCall: (event: SSEToolCallEvent) => {
             const messageItem: ChatMessage = {
               id: generateMessageId(),
-              role: "assistant",
+              role: "model",
               type: "tool_call",
               content: event.content,
               timestamp: event.timestamp,
@@ -103,7 +103,7 @@ export const useChat = () => {
             if (streamingContentRef.current.trim()) {
               const finalMessage: ChatMessage = {
                 id: generateMessageId(),
-                role: "assistant",
+                role: "model",
                 type: "message",
                 content: streamingContentRef.current,
                 timestamp: new Date().toISOString(),
@@ -131,7 +131,7 @@ export const useChat = () => {
             // 添加錯誤訊息到聊天記錄
             const errorMessage: ChatMessage = {
               id: generateMessageId(),
-              role: "assistant",
+              role: "model",
               type: "message",
               content: `❌ 錯誤: ${event.message}`,
               timestamp: new Date().toISOString(),
@@ -157,7 +157,7 @@ export const useChat = () => {
         // 添加錯誤訊息到聊天記錄
         const errorMessageItem: ChatMessage = {
           id: generateMessageId(),
-          role: "assistant",
+          role: "model",
           type: "message",
           content: `❌ 連接錯誤: ${errorMessage}`,
           timestamp: new Date().toISOString(),
