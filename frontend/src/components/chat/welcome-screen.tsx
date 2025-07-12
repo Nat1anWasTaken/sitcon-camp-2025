@@ -8,10 +8,10 @@ interface WelcomeScreenProps {
 }
 
 const suggestions = [
-  "解釋一個複雜的概念",
-  "幫我寫程式碼",
-  "創意寫作靈感",
-  "問題解決方案",
+  "記住小美喜歡吃壽司",
+  "這張截圖內的對話有料嗎",
+  "小王剛剛跟我說他明天要去台中",
+  "Nathan 不會寫程式",
 ];
 
 export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
