@@ -1,21 +1,31 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useDeleteContact } from "@/lib/api/hooks/use-contact";
 import { Contact } from "@/lib/types/api";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ContactAvatar } from "./contact-avatar";
 import { ContactInfoDisplay } from "./contact-info-display";
 import { ContactInfoEditor } from "./contact-info-editor";
-import { useDeleteContact } from "@/lib/api/hooks/use-contact";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ContactHeaderProps {
   contact: Contact;
 }
 
-export function ContactHeader({ contact, onContactDeleted }: ContactHeaderProps & { onContactDeleted?: () => void }) {
+export function ContactHeader({
+  contact,
+  onContactDeleted,
+}: ContactHeaderProps & { onContactDeleted?: () => void }) {
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
   const deleteContactMutation = useDeleteContact();
@@ -56,7 +66,9 @@ export function ContactHeader({ contact, onContactDeleted }: ContactHeaderProps 
                         size="sm"
                         disabled={deleteContactMutation?.isPending}
                       >
-                        {deleteContactMutation?.isPending ? "刪除中..." : "刪除"}
+                        {deleteContactMutation?.isPending
+                          ? "刪除中..."
+                          : "刪除"}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -65,7 +77,11 @@ export function ContactHeader({ contact, onContactDeleted }: ContactHeaderProps 
                       </DialogHeader>
                       <div>此操作無法復原。</div>
                       <DialogFooter>
-                        <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setOpen(false)}
+                        >
                           取消
                         </Button>
                         <Button
@@ -74,16 +90,21 @@ export function ContactHeader({ contact, onContactDeleted }: ContactHeaderProps 
                           disabled={deleteContactMutation?.isPending}
                           onClick={async () => {
                             try {
-                              await deleteContactMutation.mutateAsync(contact.id);
+                              await deleteContactMutation.mutateAsync(
+                                contact.id
+                              );
                               toast.success("聯絡人已刪除。");
                               setOpen(false);
                               if (onContactDeleted) onContactDeleted();
                             } catch (error) {
                               toast.error("刪除失敗，請稍後再試。");
+                              console.error(error);
                             }
                           }}
                         >
-                          {deleteContactMutation?.isPending ? "刪除中..." : "確定刪除"}
+                          {deleteContactMutation?.isPending
+                            ? "刪除中..."
+                            : "確定刪除"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>

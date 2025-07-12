@@ -135,12 +135,6 @@ export function Sidebar({
     );
   };
 
-  // 提供刪除聯絡人後的 callback
-  const handleContactDeleted = () => {
-    refetch(); // 重新取得聯絡人列表
-    if (onContactDeleted) onContactDeleted(); // 若父層有傳入 callback 也執行
-  };
-
   return (
     <div
       className={cn(
