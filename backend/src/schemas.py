@@ -171,9 +171,6 @@ class ContactBase(BaseModel):
 
     name: str = Field(..., min_length=1, max_length=100, description="聯絡人姓名")
     description: Optional[str] = Field(None, description="聯絡人描述")
-    phone: Optional[str] = Field(None, description="聯絡人電話")
-    job: Optional[str] = Field(None, description="聯絡人職業")
-    gender: Optional[str] = Field(None, description="聯絡人性別")
 
 
 class ContactCreate(ContactBase):
@@ -193,9 +190,6 @@ class ContactUpdate(BaseModel):
         None, min_length=1, max_length=100, description="聯絡人姓名"
     )
     description: Optional[str] = Field(None, description="聯絡人描述")
-    phone: Optional[str] = Field(None, description="聯絡人電話")
-    job: Optional[str] = Field(None, description="聯絡人職業")
-    gender: Optional[str] = Field(None, description="聯絡人性別")
 
 
 class ContactResponse(ContactBase):
@@ -208,9 +202,6 @@ class ContactResponse(ContactBase):
     user_id: int
     created_at: datetime
     updated_at: Optional[datetime]
-    phone: Optional[str] = None
-    job: Optional[str] = None
-    gender: Optional[str] = None
 
     class Config:
         from_attributes = True
