@@ -52,7 +52,7 @@ export function Navbar({ className }: NavbarProps) {
         return activeContactName;
       }
     }
-    return "SITCON Camp 2025";
+    return "海王";
   };
 
   // 決定顯示的簡短標題（手機版）

@@ -30,4 +30,4 @@ export class GeneralApi {
  * API 版本資訊
  */
 export const API_VERSION = "0.1.0";
-export const API_TITLE = "SITCON Camp 2025 Backend";
+export const API_TITLE = "海王 Backend";

@@ -111,7 +111,7 @@ export default function LoginPage() {
               transition={{ delay: 0.4, duration: 0.4 }}
             >
               <CardDescription className="text-center">
-                登入您的 SITCON Camp 2025 帳戶
+                登入您的 海王 帳戶
               </CardDescription>
             </motion.div>
           </CardHeader>

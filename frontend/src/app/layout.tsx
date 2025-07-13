@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SITCON Camp 2025 - 聯絡人管理系統",
+  title: "海王 - 聯絡人管理系統",
   description: "智能聯絡人管理系統，整合 AI 助手功能",
 };
 

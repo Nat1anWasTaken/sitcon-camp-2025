@@ -98,7 +98,7 @@ export default function RegisterPage() {
             </div>
             <CardTitle className="text-2xl text-center">建立帳戶</CardTitle>
             <CardDescription className="text-center">
-              加入 SITCON Camp 2025，開啟您的學習之旅
+              加入 海王，開啟您的學習之旅
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
